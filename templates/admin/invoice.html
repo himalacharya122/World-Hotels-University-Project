@@ -1,0 +1,78 @@
+<!-- templates/admin/invoice.html -->
+{% extends 'admin/layout.html' %}
+
+{% block title %}Invoice - {{ booking.booking_reference }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between mb-4">
+            <div>
+                <h2>INVOICE</h2>
+                <p>Booking Reference: {{ booking.booking_reference }}</p>
+                <p>Date: {{ booking.booking_date|date }}</p>
+            </div>
+            <div class="text-end">
+                <h4>World Hotels</h4>
+                <p>{{ booking.hotel_name }}</p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5>Guest Information</h5>
+                <p>{{ booking.guest_name }}<br>
+                {{ booking.guest_email }}</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <h5>Booking Details</h5>
+                <p>Check-in: {{ booking.check_in_date|date }}<br>
+                Check-out: {{ booking.check_out_date|date }}<br>
+                Duration: {{ booking.total_nights }} nights</p>
+            </div>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th class="text-end">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        Room {{ booking.room_number }} ({{ booking.room_type }})<br>
+                        <small>{{ booking.total_nights }} nights × £{{ "%.2f"|format(booking.base_price_per_night) }}</small>
+                        {% if not booking.is_peak %}
+                        <br><small class="text-success">Off-peak season rate applied (50% off)</small>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">£{{ "%.2f"|format(booking.subtotal) }}</td>
+                </tr>
+                {% if booking.discount_percentage > 0 %}
+                <tr>
+                    <td>
+                        Advance Booking Discount<br>
+                        <small>{{ booking.discount_percentage }}% off for booking {{ booking.days_in_advance }} days in advance</small>
+                    </td>
+                    <td class="text-end text-danger">-£{{ "%.2f"|format(booking.discount_amount) }}</td>
+                </tr>
+                {% endif %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Total Amount</th>
+                    <th class="text-end">£{{ "%.2f"|format(booking.total_price) }}</th>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="text-center mt-4">
+            <button onclick="window.print()" class="btn btn-dark">
+                <i class="bi bi-printer"></i> Print Invoice
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

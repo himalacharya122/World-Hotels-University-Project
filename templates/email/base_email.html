@@ -1,0 +1,127 @@
+<!-- templates/email/base_email.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+        .email-header {
+            background-color: #1a1a1a;
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 4px 4px 0 0;
+        }
+        .brand-name {
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 300;
+            font-family: 'Georgia', serif;
+            margin: 0;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .email-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .email-footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+        .email-footer a {
+            color: #9D8E7C;
+            text-decoration: none;
+        }
+        .email-footer a:hover {
+            text-decoration: underline;
+        }
+        h1, h2 {
+            color: #1a1a1a;
+            margin-top: 0;
+            font-family: Georgia, serif;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #9D8E7C;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #8a7d6d;
+        }
+        .contact-details {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border: 1px solid #e9ecef;
+        }
+        .message {
+            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            border: 1px solid #e9ecef;
+        }
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                padding: 10px;
+            }
+            .email-content {
+                padding: 20px;
+            }
+            .btn {
+                display: block;
+                text-align: center;
+            }
+            .brand-name {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1 class="brand-name">World Hotels</h1>
+        </div>
+        
+        <div class="email-content">
+            {% block content %}{% endblock %}
+        </div>
+        
+        <div class="email-footer">
+            <p>© {{ now.year }} World Hotels. All rights reserved.</p>
+            <p>Jhamsikhel-1, Kathmandu, Nepal</p>
+            <p>
+                <a href="{{ url_for('privacy', _external=True) }}">Privacy Policy</a> |
+                <a href="{{ url_for('terms', _external=True) }}">Terms of Service</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html> 

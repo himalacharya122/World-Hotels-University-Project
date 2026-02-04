@@ -1,0 +1,454 @@
+<!-- templates/admin/manage_bookings.html -->
+{% extends 'admin/layout.html' %}
+
+{% block title %}Manage Bookings - World Hotels{% endblock %}
+
+{% block page_title %}Manage Bookings{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<style>
+.wrap-content {
+    max-width: 200px;
+    white-space: normal;
+    word-wrap: break-word;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="confirmed" {% if status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                    <option value="cancelled" {% if status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Date Range</label>
+                <select name="date_range" class="form-select" id="dateRangeSelect">
+                    <option value="">All Dates</option>
+                    <option value="upcoming" {% if date_range == 'upcoming' %}selected{% endif %}>Upcoming</option>
+                    <option value="today" {% if date_range == 'today' %}selected{% endif %}>Today</option>
+                    <option value="past" {% if date_range == 'past' %}selected{% endif %}>Past</option>
+                    <option value="custom" {% if date_range == 'custom' %}selected{% endif %}>Custom Range</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Hotel</label>
+                <select name="hotel_id" class="form-select">
+                    <option value="">All Hotels</option>
+                    {% for hotel in hotels %}
+                    <option value="{{ hotel.hotel_id }}" {% if hotel_id|int == hotel.hotel_id %}selected{% endif %}>
+                        {{ hotel.hotel_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Search</label>
+                <input type="text" name="search" class="form-control" 
+                       value="{{ search }}" placeholder="Reference/Guest/Email">
+            </div>
+            <div class="col-md-6" id="customDateInputs" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">From</label>
+                        <input type="date" name="date_from" class="form-control" value="{{ date_from }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">To</label>
+                        <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-dark">
+                    <i class="bi bi-filter"></i> Apply Filters
+                </button>
+                <a href="{{ url_for('manage_bookings') }}" class="btn btn-outline-dark">
+                    Clear Filters
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Export Options -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('export_bookings_excel', 
+                               status=status, 
+                               date_range=date_range, 
+                               hotel_id=hotel_id, 
+                               search=search,
+                               date_from=date_from,
+                               date_to=date_to) }}" 
+               class="btn btn-dark">
+                <i class="bi bi-file-excel"></i> Export to Excel
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Bookings Table -->
+<div class="card">
+    <div class="card-body">
+        {% if bookings %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Guest</th>
+                        <th>Hotel</th>
+                        <th>Room</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.booking_reference }}</td>
+                        <td class="wrap-content">
+                            {{ booking.guest_name }}<br>
+                            <small class="text-muted">{{ booking.guest_email }}</small>
+                        </td>
+                        <td class="wrap-content">{{ booking.hotel_name }}</td>
+                        <td>
+                            {{ booking.room_number }}<br>
+                            <small class="text-muted">{{ booking.room_type }}</small>
+                        </td>
+                        <td>{{ booking.check_in_date|date }}</td>
+                        <td>{{ booking.check_out_date|date }}</td>
+                        <td>£{{ "%.2f"|format(booking.final_amount) }}</td>
+                        <td>
+                            <span class="badge bg-{{ booking.status }} text-dark">
+                                {{ booking.status|title }}
+                            </span>
+                        </td>
+                        <td class="wrap-content">
+                            {% if booking.notes %}
+                            <span class="text-muted" data-bs-toggle="tooltip" title="{{ booking.notes }}">
+                                {{ booking.notes|truncate(50, true) }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-dark dropdown-toggle" 
+                                        data-bs-toggle="dropdown">
+                                    Actions
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="#" class="dropdown-item" 
+                                           data-bs-toggle="modal" 
+                                           data-bs-target="#viewModal{{ booking.booking_id }}">
+                                            <i class="bi bi-eye"></i> View Details
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url_for('view_invoice', booking_id=booking.booking_id) }}" 
+                                           class="dropdown-item" target="_blank">
+                                            <i class="bi bi-file-text"></i> View Invoice
+                                        </a>
+                                    </li>
+                                    {% if booking.status == 'pending' %}
+                                    <li>
+                                        <a href="#" class="dropdown-item text-success"
+                                           onclick="updateStatus('{{ booking.booking_id }}', 'confirmed'); return false;">
+                                            <i class="bi bi-check-circle"></i> Confirm
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% if booking.status != 'cancelled' %}
+                                    <li>
+                                        <a href="#" class="dropdown-item text-danger"
+                                           onclick="updateStatus('{{ booking.booking_id }}', 'cancelled'); return false;">
+                                            <i class="bi bi-x-circle"></i> Cancel
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- View Modal -->
+                    <div class="modal fade" id="viewModal{{ booking.booking_id }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Booking Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="editForm{{ booking.booking_id }}" action="{{ url_for('edit_booking', booking_id=booking.booking_id) }}" method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <!-- Guest Information -->
+                                        <div class="mb-4">
+                                            <h6>Guest Information</h6>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Guest Name</label>
+                                                    <input type="text" class="form-control" name="guest_name" 
+                                                           value="{{ booking.guest_name }}" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Email</label>
+                                                    <input type="email" class="form-control" name="guest_email" 
+                                                           value="{{ booking.guest_email }}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <!-- Booking Details -->
+                                        <div class="mb-4">
+                                            <h6>Stay Details</h6>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Check-in Date</label>
+                                                    <input type="date" class="form-control" name="check_in_date" 
+                                                           value="{{ booking.check_in_date|date }}" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Check-out Date</label>
+                                                    <input type="date" class="form-control" name="check_out_date" 
+                                                           value="{{ booking.check_out_date|date }}" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Room Type</label>
+                                                    <select class="form-select" name="room_type_id" required>
+                                                        {% for room_type in room_types %}
+                                                        <option value="{{ room_type.room_type_id }}" 
+                                                                {% if room_type.type_name == booking.room_type %}selected{% endif %}>
+                                                            {{ room_type.type_name }}
+                                                        </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <!-- Notes -->
+                                        <div class="mb-4">
+                                            <h6>Notes</h6>
+                                            <textarea class="form-control" name="notes" rows="3" 
+                                                    placeholder="Add booking notes...">{{ booking.notes or '' }}</textarea>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" form="editForm{{ booking.booking_id }}" class="btn btn-primary">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container mt-4">
+            <div class="text-muted">
+                Showing {{ bookings|length }} of {{ total_bookings }} bookings
+            </div>
+            
+            {% if total_pages > 1 %}
+            <nav aria-label="Booking navigation">
+                <ul class="pagination">
+                    {% if page > 1 %}
+                    <li class="page-item prev-item">
+                        <a class="page-link" href="{{ url_for('manage_bookings', page=page-1, status=current_status, city=current_city, search=search) }}">
+                            <i class="bi bi-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-numbers">
+                        <div class="d-flex gap-1">
+                            {# First page #}
+                            {% if page > 3 %}
+                            <a class="page-link" href="{{ url_for('manage_bookings', page=1, status=current_status, city=current_city, search=search) }}">1</a>
+                            {% if page > 4 %}
+                            <span class="page-link disabled">...</span>
+                            {% endif %}
+                            {% endif %}
+                            
+                            {# Pages around current page #}
+                            {% for p in range(page - 2, page + 3) %}
+                                {% if p > 0 and p <= total_pages %}
+                                <a class="page-link {{ 'active' if p == page }}" 
+                                href="{{ url_for('manage_bookings', page=p, status=current_status, city=current_city, search=search) }}">
+                                    {{ p }}
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {# Last page #}
+                            {% if page < total_pages - 2 %}
+                            {% if page < total_pages - 3 %}
+                            <span class="page-link disabled">...</span>
+                            {% endif %}
+                            <a class="page-link" href="{{ url_for('manage_bookings', page=total_pages, status=current_status, city=current_city, search=search) }}">
+                                {{ total_pages }}
+                            </a>
+                            {% endif %}
+                        </div>
+                    </li>
+                    
+                    {% if page < total_pages %}
+                    <li class="page-item next-item">
+                        <a class="page-link" href="{{ url_for('manage_bookings', page=page+1, status=current_status, city=current_city, search=search) }}">
+                            Next <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-calendar-x" style="font-size: 3rem; color: #ccc;"></i>
+            <h5 class="mt-3">No Bookings Found</h5>
+            <p class="text-muted">Try adjusting your filters or clearing them to see more results.</p>
+            <a href="{{ url_for('manage_bookings') }}" class="btn btn-outline-dark mt-2">
+                Clear All Filters
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Status Update Confirmation Modal -->
+<div class="modal fade" id="statusConfirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Status Update</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to <span id="statusAction"></span> this booking?</p>
+                <div class="mb-3">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea class="form-control" id="statusNotes" rows="3" 
+                             placeholder="Add notes about this status change..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmStatusUpdate">
+                    Confirm Update
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ super() }}
+<script>
+let currentBookingId = null;
+let currentStatus = null;
+let statusModal = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    statusModal = new bootstrap.Modal(document.getElementById('statusConfirmModal'));
+    
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+});
+
+function updateStatus(bookingId, status) {
+    currentBookingId = bookingId;
+    currentStatus = status;
+    
+    // Update modal content
+    document.getElementById('statusAction').textContent = status;
+    document.getElementById('statusNotes').value = '';
+    
+    // Show modal
+    statusModal.show();
+}
+
+document.getElementById('confirmStatusUpdate').addEventListener('click', function() {
+    const notes = document.getElementById('statusNotes').value;
+    const button = this;
+    
+    // Disable button and show loading state
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...';
+
+    const formData = new FormData();
+    formData.append('status', currentStatus);
+    formData.append('notes', notes);
+
+    fetch(`/admin/bookings/${currentBookingId}/update-status`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            throw new Error('Error updating booking status');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Show error alert
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            Error updating booking status
+            <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        document.body.insertBefore(alertDiv, document.body.firstChild);
+        
+        // Reset button state
+        button.disabled = false;
+        button.innerHTML = 'Confirm Update';
+        
+        // Hide modal
+        statusModal.hide();
+    });
+});
+
+// Date range selector logic
+document.getElementById('dateRangeSelect').addEventListener('change', function() {
+    const customInputs = document.getElementById('customDateInputs');
+    customInputs.style.display = this.value === 'custom' ? 'block' : 'none';
+});
+
+// Initialize custom date inputs if custom is selected
+if (document.getElementById('dateRangeSelect').value === 'custom') {
+    document.getElementById('customDateInputs').style.display = 'block';
+}
+</script>
+{% endblock %}

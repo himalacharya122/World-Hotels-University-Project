@@ -1,0 +1,1016 @@
+{% extends 'common/base.html' %}
+
+{% block title %}Hotels - World Hotels{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                    url("{{ url_for('static', filename='images/destination-hero.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: left;
+        color: white;
+        text-align: center;
+    }
+
+    .hero-content h1 {
+        font-size: 3.5rem;
+        font-weight: 300;
+        margin-bottom: 1rem;
+        font-family: var(--font-display);
+        text-align: left;
+    }
+
+    .hero-content p {
+        text-align: left;
+        font-size: 1.2rem;
+        max-width: 600px;
+    }
+
+    /* Featured Section */
+    .featured-section {
+        background-color: #F8F9FA;
+        padding: 4rem 0;
+        width: 100%;
+    }
+
+    .featured-card {
+        background-color: white;
+        border: none;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    .featured-content {
+        padding-right: 2rem;
+        padding-left: 2rem;
+    }
+
+    .featured-image {
+        position: relative;
+        height: 450px;
+        overflow: hidden;
+    }
+
+
+    .featured-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .subtitle {
+        font-size: 0.8rem;
+        color: var(--accent-color);
+        letter-spacing: 2px;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    .featured-title {
+        font-size: 2rem;
+        font-weight: 300;
+        color: #333;
+        margin-bottom: 1rem;
+        font-family: var(--font-display);
+        line-height: 1.2;
+    }
+
+    .featured-description {
+        font-size: 1rem; 
+        color: #666;
+        line-height: 1.7;
+        margin-bottom: 1.5rem; 
+    }
+
+
+    #hotels-section {
+        scroll-margin-top: calc(var(--header-height) + 20px); 
+    }
+
+    .discover-more {
+        display: inline-block;
+        color: #666;
+        text-decoration: none;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-bottom: 1px solid #666;
+        padding-bottom: 3px;
+        transition: all 0.3s ease;
+    }
+
+    .discover-more:hover {
+        color: #333;
+        border-color: #333;
+    }
+
+
+
+    @media (min-width: 576px) and (max-width: 1200px) {
+        .featured-card {
+            width: 90% !important;
+            margin: 0 auto;
+        }
+        .featured-section .container {
+            max-width: 99%;
+            width: 99%;
+        }
+    }
+
+    @media (min-width: 768px) and (max-width: 991px) {
+        .featured-card {
+            width: 99% !important;
+            margin: 0 auto;
+        }
+        
+        .featured-section .container {
+            max-width: 99%;
+            width: 99%;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .featured-content {
+            padding: 2rem;
+            margin-bottom: 0;
+            text-align: center;
+        }
+
+        .featured-title {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .featured-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .featured-image {
+            height: 350px;
+        }
+
+        .row.align-items-center {
+            flex-direction: column;
+        }
+
+        .col-lg-5, .col-lg-7 {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        .featured-card {
+            width: 99% !important;
+            margin: 0 auto;
+        }
+        
+        .featured-section .container {
+            max-width: 99%;
+            width: 99%;
+        }
+
+        .featured-content {
+            padding: 1.5rem;
+        }
+
+        .featured-title {
+            font-size: 1.8rem;
+        }
+
+        .subtitle {
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .featured-description {
+            font-size: 0.9rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .featured-image {
+            height: 250px;
+        }
+
+        .discover-more {
+            font-size: 0.75rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .featured-content {
+            padding: 1.25rem;
+        }
+
+        .featured-title {
+            font-size: 1.5rem;
+        }
+
+        .featured-image {
+            height: 200px;
+        }
+    }
+
+
+    /* Filters Section */
+    .filters-wrapper {
+        border-top: 1px solid #dee2e6;
+        background: #F8F9FA;
+        padding: 2rem 0;
+        margin-bottom: 3rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .filters-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex: 1;
+    }
+
+    .form-select {
+        appearance: none;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: #495057;
+    }
+
+    .form-select:hover {
+        border-color: #9D8E7C;
+    }
+
+    .form-select:focus {
+        border-color: #9D8E7C;
+        box-shadow: 0 0 0 0.2rem rgba(157, 142, 124, 0.25);
+        outline: none;
+    }
+
+    /* Results count styling */
+    .results-count {
+        font-size: 0.9rem;
+        color: #6c757d;
+        white-space: nowrap;
+    }
+
+    .col-md-6.col-lg-4 {
+        margin-bottom: 2rem;
+        padding: 0 1rem; 
+    }
+
+    /* Hotels Grid */
+    .hotels-grid {
+        margin-bottom: 3rem;
+    }
+
+    .hotel-card {
+        background: white;
+        border: none;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .hotel-image-container {
+        height: 250px;
+        overflow: hidden;
+    }
+
+    .hotel-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .hotel-card:hover .hotel-image {
+        transform: scale(1.1);
+    }
+
+    .hotel-details {
+        padding: 1.5rem;
+    }
+
+    .hotel-location {
+        font-size: 0.9rem;
+        color: var(--accent-color);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .hotel-name {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        font-family: var(--font-display);
+        color: var(--text-dark);
+    }
+
+    .hotel-description {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+
+    .hotel-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-top: auto;
+    }
+
+    .hotel-price {
+        flex: 1;
+    }
+
+    .price-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .price-amount {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .explore-btn {
+        flex: 1;
+        padding: 1rem;
+        text-align: center;
+        background: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        transition: background 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .explore-btn:hover {
+        background: var(--accent-color);
+        color: white;
+    }
+
+
+
+    .load-more-container {
+        text-align: center;
+        padding: 0 0 4rem;
+        margin-top: -2rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    .arrow-load-more {
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.3s ease;
+        padding: 1rem;
+    }
+
+    .arrow-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        margin-bottom: 2rem;
+    }
+
+    .arrow {
+        width: 15px;
+        height: 15px;
+        border: 2.5px solid var(--primary-color);
+        border-left: 0;
+        border-top: 0;
+        transform: rotate(45deg);
+        animation: arrow-bounce 2s infinite;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .load-text {
+        font-size: 0.75rem;
+        color: var(--primary-color);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.8;
+        transition: all 0.3s ease;
+    }
+
+    .arrow:nth-child(1) {
+        animation-delay: 0s;
+    }
+
+    .arrow:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .arrow:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    .arrow-load-more:hover .arrow {
+        border-color: var(--accent-color);
+        width: 18px;
+        height: 18px;
+    }
+
+    .arrow-load-more.loading .arrow-container {
+        opacity: 0.5;
+    }
+
+    @keyframes arrow-bounce {
+        0% {
+            opacity: 0;
+            transform: rotate(45deg) translate(-12px, -12px);
+        }
+        50% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            transform: rotate(45deg) translate(12px, 12px);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .load-more-container {
+            margin-bottom: 1rem;
+            margin-top: -4rem !important;
+        }
+        .arrow {
+            width: 12px;
+            height: 12px;
+            border-width: 2px;
+        }
+        
+        .arrow-load-more:hover .arrow {
+            width: 15px;
+            height: 15px;
+        }
+    }
+
+
+
+
+
+
+    @media (max-width: 1200px) {
+        .col-lg-4 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .hero-content h1 {
+            font-size: 2.5rem;
+        }
+
+
+        .hero-content p {
+            font-size: 1rem;
+        }
+
+        .filters-section {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .filter-group {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .form-select {
+            width: 100%;
+        }
+
+        .results-count {
+            text-align: center;
+            margin-top: 1rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-content h1 {
+            font-size: 2.5rem;
+        }
+
+        .filters-section {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .filter-group {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .form-select {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .results-count {
+            padding-left: 0;
+            text-align: center;
+        }
+
+        .col-md-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .hotel-card {
+            margin-bottom: 1.5rem;
+        }
+
+        .hotel-image-container {
+            height: 200px;
+        }
+
+        .hotel-name {
+            font-size: 1.3rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-content h1 {
+            font-size: 2rem;
+            text-align: left !important;
+            max-width: 300px;
+        }
+
+        .hero-content p {
+            text-align: left !important;
+            font-size: 1rem;
+            max-width: 350px;
+        }
+
+        .hotel-image-container {
+            height: 180px;
+        }
+
+        .hotel-details {
+            padding: 1rem;
+        }
+
+        .load-more-btn {
+            width: 80%;
+            margin: 1.5rem auto;
+        }
+    }
+
+    @media (min-width: 769px) {
+        .filters-wrapper {
+            padding: 1.25rem 0;
+        }
+
+        .filters-section {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hotel-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hotel-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .explore-btn {
+            margin-top: auto;
+        }
+    }
+
+    .dropdown {
+        position: relative;
+        flex: 1;
+    }
+
+    .dropdown .form-control {
+        width: 100%;
+        text-align: left;
+        background: white;
+        border: 1px solid #dee2e6;
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        position: relative;
+        font-size: 0.9rem;
+        color: #495057;
+        border-radius: 0 !important;
+    }
+
+    .dropdown .form-control:hover {
+        border-color: #9D8E7C;
+    }
+
+    .dropdown-toggle::after {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .dropdown-menu {
+        width: 100%;
+        padding: 0.5rem 0;
+        margin-top: 0.25rem;
+        border: none;
+        border-radius: 0 !important;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 0.5rem 0;
+    }
+
+    .dropdown-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: #495057;
+        border-bottom: 1px solid #dadada;
+        transition: all 0.2s ease;
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+        background-color: #F8F9FA;
+    }
+
+    @media (max-width: 991px) {
+        .filter-group {
+            flex-direction: column;
+            width: 100%;
+            gap: 1rem;
+        }
+
+        .dropdown {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hotel-footer {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .hotel-price {
+            text-align: center;
+        }
+        
+        .explore-btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container hero-content">
+        <h1>Discover Your Perfect Stay</h1>
+        <p>Explore our handpicked collection of luxury hotels across the United Kingdom</p>
+    </div>
+</div>
+
+<div class="featured-section">
+    <div class="container">
+        <div class="featured-card">
+            <div class="row align-items-center">
+                <div class="col-lg-5">
+                    <div class="featured-content">
+                        <div class="subtitle">FEATURED COLLECTION</div>
+                        <h2 class="featured-title">Luxury Stays in the UK</h2>
+                        <p class="featured-description">Stay in the best places across the United Kingdom. From old castles to modern luxury hotels, enjoy great service and unique styles that make every stay special.</p>
+                        <a href="#hotels-section" class="discover-more">Discover more</a>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="featured-image">
+                        <img src="{{ url_for('static', filename='images/featured-hotel.jpg') }}" alt="Luxury Hotel">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Section -->
+<div class="filters-wrapper">
+    <div class="container">
+        <div class="filters-section">
+            <div class="filter-group">
+                <!-- City Filter -->
+                <div class="dropdown">
+                    <button class="form-control text-start dropdown-toggle" 
+                            type="button" 
+                            data-bs-toggle="dropdown">
+                        <span id="cityFilterSummary">All Cities</span>
+                    </button>
+                    <div class="dropdown-menu guest-dropdown p-3">
+                        <div class="dropdown-item city-option" data-value="">All Cities</div>
+                        {% for city in cities %}
+                            <div class="dropdown-item city-option" data-value="{{ city.city }}">
+                                {{ city.city }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Sort Filter -->
+                <div class="dropdown">
+                    <button class="form-control text-start dropdown-toggle" 
+                            type="button" 
+                            data-bs-toggle="dropdown">
+                        <span id="sortSummary">Sort By: Recommended</span>
+                    </button>
+                    <div class="dropdown-menu guest-dropdown p-3">
+                        <div class="dropdown-item sort-option" data-value="recommended">Sort By: Recommended</div>
+                        <div class="dropdown-item sort-option" data-value="price-low">Price: Low to High</div>
+                        <div class="dropdown-item sort-option" data-value="price-high">Price: High to Low</div>
+                    </div>
+                </div>
+            </div>
+            <div class="results-count">{{ hotels|length }} Hotels found</div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Hotels Grid -->
+    <section class="hotels-grid" id="hotels-section">
+        <div class="row">
+            {% for hotel in hotels %}
+            <div class="col-md-6 col-lg-4">
+                <div class="hotel-card">
+                    <div class="hotel-image-container">
+                        {% if hotel.hotel_image %}
+                        <img src="{{ url_for('static', filename=hotel.hotel_image.replace('/static/', '')) }}" 
+                             class="hotel-image" alt="{{ hotel.hotel_name }}">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='images/placeholder-hotel.jpg') }}" 
+                             class="hotel-image" alt="{{ hotel.hotel_name }}">
+                        {% endif %}
+                    </div>
+                    <div class="hotel-details">
+                        <div class="hotel-location">{{ hotel.city }}, United Kingdom</div>
+                        <h3 class="hotel-name">{{ hotel.title or hotel.hotel_name }}</h3>
+                        <p class="hotel-description">{{ hotel.description[:100] }}...</p>
+                        <div class="hotel-footer">
+                            {% if hotel.starting_price %}
+                            <div class="hotel-price">
+                                <div class="price-label">rates from</div>
+                                <div class="price-amount">£{{ "%.0f"|format(hotel.starting_price) }}</div>
+                            </div>
+                            {% endif %}
+                            <a href="{{ url_for('hotel_details', hotel_id=hotel.hotel_id) }}" 
+                               class="explore-btn">Explore</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<div class="load-more-container">
+    <button class="arrow-load-more" id="loadMoreBtn">
+        <div class="arrow-container">
+            <div class="arrow"></div>
+            <div class="arrow"></div>
+            <div class="arrow"></div>
+        </div>
+        <span class="load-text">Load</span>
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let hotelCards = document.querySelectorAll('.col-md-6.col-lg-4');
+        let hasMore = true;
+        let currentPage = 1;
+        let isLoading = false;
+
+        document.querySelector('.discover-more').addEventListener('click', function(e) {
+            e.preventDefault();
+            const hotelsSection = document.querySelector('.hotels-grid');
+            hotelsSection.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Setup city filter
+        document.querySelectorAll('.city-option').forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const value = this.dataset.value;
+                document.getElementById('cityFilterSummary').textContent = this.textContent;
+                
+                // Filter hotels
+                filterHotels(value);
+                
+                // Close the dropdown
+                const dropdownMenu = this.closest('.dropdown-menu');
+                dropdownMenu.classList.remove('show');
+            });
+        });
+
+        // Setup sort filter
+        document.querySelectorAll('.sort-option').forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const value = this.dataset.value;
+                document.getElementById('sortSummary').textContent = this.textContent;
+                
+                // Sort hotels
+                sortHotels(value);
+                
+                // Close the dropdown
+                const dropdownMenu = this.closest('.dropdown-menu');
+                dropdownMenu.classList.remove('show');
+            });
+        });
+
+        // Load More functionality
+        document.getElementById('loadMoreBtn').addEventListener('click', async function() {
+            if (isLoading || !hasMore) return;
+            
+            try {
+                isLoading = true;
+                this.classList.add('loading');
+                
+                const selectedCity = document.getElementById('cityFilterSummary').textContent;
+                const response = await fetch(
+                    `/destinations?page=${currentPage + 1}&city=${selectedCity}`,
+                    { headers: { 'X-Requested-With': 'XMLHttpRequest' } }
+                );
+                
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                
+                if (data.hotels && data.hotels.length > 0) {
+                    const container = document.querySelector('.hotels-grid .row');
+                    data.hotels.forEach(hotel => {
+                        const card = createHotelCard(hotel);
+                        container.appendChild(card);
+                    });
+                    
+                    currentPage++;
+                    hotelCards = document.querySelectorAll('.col-md-6.col-lg-4');
+                    updateResultsCount();
+                    
+                    hasMore = data.hasMore;
+                    if (!hasMore) {
+                        this.style.display = 'none';
+                    }
+                } else {
+                    hasMore = false;
+                    this.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading more hotels:', error);
+                hasMore = false;
+                this.style.display = 'none';
+            } finally {
+                isLoading = false;
+                if (hasMore) {
+                    this.classList.remove('loading');
+                }
+            }
+        });
+
+        function filterHotels(city) {
+            const hotelCards = document.querySelectorAll('.col-md-6.col-lg-4');
+            let visibleCount = 0;
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+            hotelCards.forEach(card => {
+                const cardCity = card.querySelector('.hotel-location').textContent.toLowerCase();
+                const shouldShow = !city || cardCity.toLowerCase().includes(city.toLowerCase());
+                card.style.display = shouldShow ? 'block' : 'none';
+                if (shouldShow) visibleCount++;
+            });
+
+            // Update results count
+            document.querySelector('.results-count').textContent = `${visibleCount} Hotels found`;
+            
+            // Reset pagination state
+            currentPage = 1;
+            
+            // Show/hide load more button based on filtered results
+            if (city) {
+                // If filtering by city, hide load more button
+                loadMoreBtn.style.display = 'none';
+                hasMore = false;
+            } else {
+                // If showing all cities, show load more button and reset hasMore
+                loadMoreBtn.style.display = 'block';
+                hasMore = true;
+            }
+        }
+
+        function sortHotels(sortBy) {
+            const container = document.querySelector('.hotels-grid .row');
+            const hotelCards = Array.from(document.querySelectorAll('.col-md-6.col-lg-4'));
+            
+            hotelCards.sort((a, b) => {
+                if (sortBy === 'recommended') {
+                    return Array.from(container.children).indexOf(a) - 
+                        Array.from(container.children).indexOf(b);
+                }
+
+                const priceA = getPriceFromCard(a);
+                const priceB = getPriceFromCard(b);
+                
+                return sortBy === 'price-low' ? priceA - priceB : priceB - priceA;
+            });
+
+            container.innerHTML = '';
+            hotelCards.forEach(card => container.appendChild(card));
+        }
+
+        function getPriceFromCard(card) {
+            const priceElement = card.querySelector('.price-amount');
+            if (!priceElement) return 0;
+            return parseFloat(priceElement.textContent.replace(/[^0-9.]/g, '')) || 0;
+        }
+
+        function createHotelCard(hotel) {
+            const card = document.createElement('div');
+            card.className = 'col-md-6 col-lg-4';
+            
+            const imageUrl = hotel.hotel_image 
+                ? `/static/${hotel.hotel_image.replace('/static/', '')}` 
+                : '/static/images/placeholder-hotel.jpg';
+
+            card.innerHTML = `
+                <div class="hotel-card">
+                    <div class="hotel-image-container">
+                        <img src="${imageUrl}" class="hotel-image" alt="${hotel.hotel_name}">
+                    </div>
+                    <div class="hotel-details">
+                        <div class="hotel-location">${hotel.city}, United Kingdom</div>
+                        <h3 class="hotel-name">${hotel.title || hotel.hotel_name}</h3>
+                        <p class="hotel-description">${(hotel.description || '').substring(0, 100)}...</p>
+                        <div class="hotel-footer">
+                            ${hotel.starting_price ? `
+                                <div class="hotel-price">
+                                    <div class="price-label">rates from</div>
+                                    <div class="price-amount">£${Math.round(hotel.starting_price)}</div>
+                                </div>
+                            ` : ''}
+                            <a href="/hotel/${hotel.hotel_id}" class="explore-btn">Explore</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        function updateResultsCount() {
+            const visibleCards = document.querySelectorAll('.col-md-6.col-lg-4[style*="display: block"], .col-md-6.col-lg-4:not([style*="display"])').length;
+            document.querySelector('.results-count').textContent = `${visibleCards} Hotels found`;
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'email/base_email.html' %}
+
+{% block content %}
+<h2>Welcome to World Hotels Newsletter</h2>
+
+<div class="content">
+    <p>Thank you for subscribing to our newsletter! You'll now receive updates about our latest offers, luxury experiences, and exclusive content.</p>
+    
+    <p>Here's what you can expect:</p>
+    <ul style="color: #666; line-height: 1.8;">
+        <li>Exclusive hotel deals and promotions</li>
+        <li>Luxury travel insights and destinations</li>
+        <li>Special event announcements</li>
+        <li>Seasonal offers and packages</li>
+    </ul>
+
+    <p>We look forward to sharing our world of luxury hospitality with you.</p>
+    
+    <div class="contact-details" style="margin-top: 30px;">
+        <p style="margin: 0;">
+            Want to unsubscribe? 
+            <a href="{{ url_for('unsubscribe_newsletter', token=unsubscribe_token, _external=True) }}" 
+               style="color: #9D8E7C; text-decoration: none;">
+                Click here
+            </a>
+        </p>
+    </div>
+
+    <p style="margin-top: 30px;">
+        Best regards,<br>
+        <strong>World Hotels Team</strong>
+    </p>
+</div>
+{% endblock %}

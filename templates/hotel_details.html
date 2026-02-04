@@ -1,0 +1,1022 @@
+{% extends 'common/base.html' %}
+
+{% block title %}{{ hotel.hotel_name }} - World Hotels{% endblock %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
+
+
+<style>
+    /* Hero Section */
+    .hotel-hero {
+        position: relative;
+        height: 600px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: flex-end;
+        transition: background-image 0.3s ease;
+    }
+
+    .hero-content {
+        width: 100%;
+        padding: 6rem 0 4rem;
+        background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+        color: var(--text-light);
+    }
+
+    .hero-content h1 {
+        font-size: 3.5rem;
+        font-weight: 300;
+        margin-bottom: 1rem;
+        font-family: var(--font-display);
+        text-align: left;
+    }
+
+    .hero-content p {
+        font-size: 1.2rem;
+        text-align: left;
+        max-width: 600px;
+    }
+
+
+
+
+
+    /* Hotel Info Sections */
+    .hotel-info-section {
+        background-color: #F8F9FA;
+        padding: 4rem 0;
+        width: 100%;
+        margin-top: 2rem;
+    }
+
+    .hotel-info-section h2 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-family: var(--font-display);
+        line-height: 1.2;
+    }
+
+    .hotel-card {
+        background-color: white;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        margin-bottom: 4rem;
+        display: flex;
+        overflow: hidden;
+    }
+
+    .hotel-card .row {
+        width: 100%;
+        margin: 0;
+    }
+
+    .hotel-content {
+        padding: 3rem 1.5rem;
+    }
+
+    .hotel-image-container {
+        padding: 0;
+        height: 100%;
+    }
+
+
+    .hotel-image {
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .hotel-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .subtitle {
+        font-size: 0.8rem;
+        color: var(--accent-color);
+        letter-spacing: 2px;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 300;
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-family: var(--font-display);
+        line-height: 1.2;
+    }
+
+    .section-description {
+        font-size: 1rem;
+        color: #666;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+    }
+
+    .amenities-section {
+        margin-top: 2rem;
+        border-top: 1px solid rgba(0,0,0,0.1);
+        padding-top: 2rem;
+    }
+
+    .amenities-title {
+        font-size: 1.1rem;
+        font-weight: 400;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        font-family: var(--font-display);
+    }
+
+    .amenities-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1.5rem; 
+        row-gap: 1.25rem;
+    }
+
+    .amenity-badge {
+        font-size: 0.85rem;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0.25rem 0;
+    }
+
+    .amenity-badge i {
+        font-size: 1.1rem;
+        color: var(--accent-color);
+        min-width: 20px;
+        text-align: center;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 991px) {
+        .hotel-content {
+            padding: 2rem 1.25rem;
+        }
+
+        .hotel-image {
+            height: 350px;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+        }
+
+        .amenities-grid {
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+        }
+        
+        .amenities-section {
+            text-align: left;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hotel-content {
+            padding: 1.5rem 1rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+        }
+
+        .hotel-image {
+            height: 250px;
+        }
+
+        .amenities-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+            row-gap: 1rem;
+        }
+        
+        .amenity-badge {
+            font-size: 0.8rem;
+        }
+        
+        .amenity-badge i {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hotel-content {
+            padding: 1.25rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+        }
+
+        .hotel-image {
+            height: 200px;
+        }
+        
+        .amenities-grid {
+            gap: 1rem;
+            row-gap: 0.875rem;
+        }
+        
+        .amenity-badge {
+            padding: 0.4rem 0.6rem;
+        }
+        
+        .amenity-badge i {
+            font-size: 0.9rem;
+        }
+    }
+
+
+
+
+
+    /* Booking Nav */
+    .booking-nav {
+        background: white;
+        padding: 2rem 0;
+        width: 100%;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .booking-nav.shadow {
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Form Labels */
+    .form-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Date Input Container */
+    .date-input-container {
+        position: relative;
+    }
+
+    .date-input-container i {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9D8E7C;
+    }
+
+    .date-range-info {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+
+    /* Form Controls */
+    .form-control,
+    .btn,
+    .dropdown-menu {
+        border-radius: 0 !important;
+    }
+
+    .form-control {
+        height: 50px;
+        border: 1px solid #dee2e6;
+    }
+
+    .form-control:focus {
+        border-color: #9D8E7C;
+        box-shadow: none;
+    }
+
+    /* Dropdown Styling */
+    .dropdown-toggle {
+        background: white;
+        text-align: left;
+        position: relative;
+        height: 50px;
+        padding-right: 2rem;
+    }
+
+    .dropdown-toggle::after {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    /* Keep this style for guest dropdown */
+    .guest-dropdown {
+        width: 100%;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1) !important;
+        padding: 1.5rem !important;
+        border: none !important;
+    }
+
+    .guest-counter {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .guest-counter span {
+        font-size: 0.9rem;
+        color: #495057;
+    }
+
+    .room-type-info {
+        border-top: 1px solid #dee2e6;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+
+    .room-type-info small {
+        font-size: 0.8rem;
+        line-height: 1.8;
+    }
+
+    /* Counter Buttons */
+    .counter-btn {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #dee2e6;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .counter-btn:hover:not(:disabled) {
+        background: #9D8E7C;
+        color: white;
+        border-color: #9D8E7C;
+    }
+
+    /* Search Button */
+    .btn-dark {
+        height: 50px;
+        width: 100%;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        background: #000;
+        border: none;
+        padding: 0 2rem;
+    }
+
+    .btn-dark:hover {
+        background: #9D8E7C;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Currency Dropdown Styling */
+    .dropdown-divider {
+        margin: 0;
+        border-top: 1px solid var(--accent-color);
+        opacity: 0.2;
+    }
+
+    .currency-option {
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .currency-option:hover {
+        background-color: #f8f9fa;
+        color: var(--accent-color);
+    }
+
+    @media (min-width: 768px) {
+        .col-12 {
+            width: 25%;
+            padding: 0 8px;
+        }
+
+    }
+
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .booking-nav {
+            padding: 1rem 0;
+        }
+        
+        .guest-dropdown {
+            width: 100% !important;
+        }
+        
+        .btn-dark {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .col-12.col-md-3 {
+            padding: 0 15px;
+        }
+    }
+
+
+
+    
+
+    .room-type-card {
+        background: white;
+        border: none;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .room-type-card .row {
+        min-height: 300px;
+    }
+
+    .room-type-card .col-md-4 {
+        padding: 0;
+    }
+
+    /* Middle column padding */
+    .room-type-card .col-md-5 {
+        padding: 1.5rem;
+    }
+
+    /* Price column */
+    .room-type-card .col-md-3 {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: #f8f9fa;
+    }
+
+    .room-thumbnail {
+        width: 100%;
+        height: 100%; 
+        object-fit: cover;
+        border-right: 1px solid #eee; 
+    }
+
+    .room-description {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .room-features {
+        margin-top: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+
+    .feature-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #F8F9FA;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        color: var(--secondary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .amenities-title {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0.75rem;
+    }
+
+    .amenities-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .amenity-item {
+        font-size: 0.85rem;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0;
+    }
+
+    .availability-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        border-radius: 0;
+    }
+
+    .availability-badge.available {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .availability-badge.sold-out {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .price-display {
+        font-size: 1.4rem;
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+
+
+    @media (max-width: 768px) {
+        .room-type-card .row {
+            min-height: auto;
+        }
+
+        .room-thumbnail {
+            height: 230px !important;
+            margin-bottom: 0;
+        }
+        
+        .room-type-card .col-md-5,
+        .room-type-card .col-md-3 {
+            padding: 1rem;
+        }
+
+        .amenities-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+            
+
+        .col-md-3.text-end {
+            text-align: left !important;
+            margin-top: 0;
+            background: none;
+        }
+    }
+
+
+    @media (max-width: 768px) {
+        .room-thumbnail {
+            height: 150px;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-grid {
+            grid-template-columns: repeat(2, 1fr);
+        } 
+        
+    }
+
+
+    @media (max-width: 768px) {
+        .hotel-hero {
+            height: 400px;
+        }
+
+        .d-flex.gap-3 {
+            flex-direction: column;
+            gap: 1rem !important;
+        }
+
+        .col-md-4.text-end {
+            text-align: center !important;
+            margin-top: 1rem;
+        }
+
+        #checkAvailability {
+            width: 100%;
+        }
+
+        .amenities-list {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+    }
+
+
+    /* Validation Modal */
+    .modal-content {
+        border-radius: 0;
+        border: 1px solid var(--accent-color);
+    }
+
+    .modal-header {
+        border-radius: 0;
+        background: #f8f9fa;
+        border-bottom: 1px solid var(--accent-color);
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-footer {
+        border-radius: 0;
+        border-top: 1px solid #dee2e6;
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .btn-close {
+        border-radius: 0;
+    }
+
+    .modal .btn {
+        border-radius: 0;
+        padding: 0.75rem 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hotel-hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+    url('{{ hotel.hero_image or hotel.featured_image or url_for('static', filename='images/search-hero.jpg') }}');">
+    <div class="hero-content">
+        <div class="container">
+            <h1>{{ hotel.hotel_name }}</h1>
+            <p class="lead">{{ hotel.city }}, United Kingdom</p>
+        </div>
+    </div>
+</section>
+
+<!-- Booking Nav -->
+<div class="booking-nav">
+    <div class="container">
+        <form id="bookingForm" class="search-box" action="{{ url_for('room_list') }}" method="GET">
+            <input type="hidden" name="hotel_id" value="{{ hotel.hotel_id }}">
+            <div class="row g-3">
+                <!-- Check-in Date -->
+                <div class="col-md-3">
+                    <label class="form-label">Check In</label>
+                    <div class="date-input-container">
+                        <input type="text" 
+                               class="form-control datepicker" 
+                               id="checkInDate" 
+                               name="check_in"
+                               required
+                               placeholder="Select date">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                </div>
+
+                <!-- Check-out Date -->
+                <div class="col-md-3">
+                    <label class="form-label">Check Out</label>
+                    <div class="date-input-container">
+                        <input type="text" 
+                               class="form-control datepicker" 
+                               id="checkOutDate"
+                               name="check_out"
+                               required 
+                               placeholder="Select date">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                </div>
+
+                <!-- Guests -->
+                <div class="col-md-3">
+                    <label class="form-label">Guests</label>
+                    <div class="dropdown">
+                        <button class="form-control text-start dropdown-toggle" 
+                                type="button" 
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <span id="guestSummary">1 Guest</span>
+                        </button>
+                        <div class="dropdown-menu guest-dropdown p-3" onclick="event.stopPropagation()">
+                            <div class="guest-counter">
+                                <span>Adults</span>
+                                <div class="d-flex align-items-center">
+                                    <button type="button" class="counter-btn" onclick="updateGuests('adults', -1)">-</button>
+                                    <span id="adultsCount" class="mx-3">1</span>
+                                    <button type="button" class="counter-btn" onclick="updateGuests('adults', 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="guests" id="adultsInput" value="1">
+                </div>
+
+                <!-- Currency -->
+                <div class="col-md-3">
+                    <label class="form-label">Currency</label>
+                    <div class="dropdown">
+                        <button class="form-control text-start dropdown-toggle" 
+                                type="button" 
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <span id="currencySummary">
+                                GBP (£)
+                            </span>
+                        </button>
+                        <div class="dropdown-menu guest-dropdown p-0" onclick="event.stopPropagation()">
+                            {% for currency in currencies %}
+                                <div class="dropdown-item currency-option" 
+                                    data-code="{{ currency.code }}"
+                                    data-symbol="{{ currency.symbol }}">
+                                    {{ currency.code }} ({{ currency.symbol }})
+                                </div>
+                                {% if not loop.last %}
+                                    <div class="dropdown-divider"></div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <input type="hidden" name="currency" id="currencyInput" value="GBP">
+                </div>
+
+            <!-- Check Availability Button -->
+            <div class="col-12 text-end mt-3">
+                <button type="submit" class="btn btn-dark" id="checkAvailability">
+                    Check Availability
+                </button>
+            </div>
+        </form>
+        <div class="modal fade" id="validationModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Required Fields</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="validationMessage"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hotel Info Section -->
+<div class="hotel-info-section">
+    <div class="container">
+        <!-- About Section with Amenities -->
+        <div class="hotel-card">
+            <div class="row align-items-center">
+                <div class="col-lg-5">
+                    <div class="hotel-content">
+                        <div class="subtitle">ABOUT THE HOTEL</div>
+                        <h2 class="section-title">A Luxury Experience</h2>
+                        <p class="section-description">{{ hotel.description }}</p>
+                        <div class="amenities-section">
+                            <h3 class="amenities-title">Amenities</h3>
+                            <div class="amenities-grid">
+                                {% if hotel.amenities %}
+                                    {% for amenity_name in hotel.amenities.split(',') %}
+                                        {% if hotel.amenity_icons %}
+                                            {% set icons = hotel.amenity_icons.split(',') %}
+                                            <div class="amenity-badge">
+                                                <i class="fas {{ icons[loop.index0] }}"></i>
+                                                <span class="ms-2">{{ amenity_name }}</span>
+                                            </div>
+                                        {% else %}
+                                            <div class="amenity-badge">
+                                                <span>{{ amenity_name }}</span>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <p>No amenities listed for this hotel.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7 hotel-image-container">
+                    <div class="hotel-image">
+                        {% if hotel.featured_image %}
+                            <img src="{{ hotel.featured_image }}" alt="{{ hotel.hotel_name }}">
+                        {% elif hotel.hotel_image %}
+                            <img src="{{ url_for('static', filename='images/' + hotel.hotel_image) }}" alt="{{ hotel.hotel_name }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/default-hotel.jpg') }}" alt="{{ hotel.hotel_name }}">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Room Types -->
+        <section>
+            <h2>Available Room Types</h2>
+            <div class="room-types mt-4">
+                {% for room in room_types %}
+                <div class="room-type-card p-4">
+                    <div class="row">
+                        <!-- Room Image -->
+                        <div class="col-md-4">
+                            {% if room.room_image %}
+                                <img src="{{ room.room_image }}" 
+                                    alt="{{ room.type_name }}" 
+                                    class="img-fluid room-thumbnail">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/placeholder-room.jpg') }}" 
+                                    alt="{{ room.type_name }}" 
+                                    class="img-fluid room-thumbnail">
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Room Details -->
+                        <div class="col-md-5">
+                            <h3>{{ room.type_name }}</h3>
+                            <p class="room-description">{{ room.description }}</p>
+                            
+                            <!-- Room Features -->
+                            <div class="room-features">
+                                <span class="feature-badge">
+                                    <i class="fa fa-users"></i>
+                                    Up to {{ room.max_occupancy }} guests
+                                </span>
+                                
+                                {% if room.features %}
+                                <div class="amenities-grid mt-3">
+                                    {% for feature in room.features.split(',') %}
+                                    <span class="amenity-item">
+                                        <i class="fas {{ room.feature_icons.split(',')[loop.index0] }}"></i>
+                                        {{ feature }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Pricing -->
+                        <div class="col-md-3 text-end">
+                            <div class="price-display mb-2">
+                                From £{{ "%.2f"|format(room.starting_price) }}
+                            </div>
+                            <small class="text-muted d-block mb-3">per night</small>
+                            {% if room.available_rooms > 0 %}
+                                <span class="availability-badge available">
+                                    {{ room.available_rooms }} rooms available
+                                </span>
+                            {% else %}
+                                <span class="availability-badge sold-out">
+                                    Sold Out
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Flatpickr for check-in
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 90); // 3 months advance booking limit
+
+    const commonConfig = {
+        disableMobile: true,
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "F j, Y",
+        allowInput: false,
+        clickOpens: true
+    };
+
+    // Initialize Flatpickr for check-in
+    const checkInPicker = flatpickr('#checkInDate', {
+        ...commonConfig,
+        minDate: today,
+        maxDate: maxDate,
+        onChange: function(selectedDates) {
+            if (selectedDates[0]) {
+                const minCheckOut = new Date(selectedDates[0]);
+                minCheckOut.setDate(minCheckOut.getDate() + 1);
+                
+                const maxCheckOut = new Date(selectedDates[0]);
+                maxCheckOut.setDate(maxCheckOut.getDate() + 30);
+                
+                checkOutPicker.set('minDate', minCheckOut);
+                checkOutPicker.set('maxDate', maxCheckOut);
+                
+                checkOutPicker.clear();
+                setTimeout(() => checkOutPicker.open(), 100);
+            }
+        }
+    });
+
+    document.querySelectorAll('.currency-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const code = this.dataset.code;
+            document.getElementById('currencySummary').textContent = this.textContent.trim();
+            document.getElementById('currencyInput').value = code;
+            // Close the dropdown
+            const dropdownMenu = this.closest('.dropdown-menu');
+            dropdownMenu.classList.remove('show');
+        });
+    });
+
+    // Initialize Flatpickr for check-out
+    const checkOutPicker = flatpickr('#checkOutDate', {
+        ...commonConfig
+    });
+
+    // Guest counter functionality
+    window.guests = {
+        adults: 1
+    };
+
+    window.updateGuests = function(type, change) {
+        const newValue = window.guests[type] + change;
+        if (type === 'adults' && (newValue < 1 || newValue > 4)) return;
+        
+        window.guests[type] = newValue;
+        document.getElementById(`${type}Count`).textContent = newValue;
+        document.getElementById(`${type}Input`).value = newValue;
+        updateCounterButtonStates();
+        updateSummary();
+    };
+
+    function updateCounterButtonStates() {
+        const minusBtn = document.querySelector('[onclick="updateGuests(\'adults\', -1)"]');
+        const plusBtn = document.querySelector('[onclick="updateGuests(\'adults\', 1)"]');
+        
+        if (minusBtn) minusBtn.disabled = window.guests.adults <= 1;
+        if (plusBtn) plusBtn.disabled = window.guests.adults >= 4;
+    }
+
+    function updateSummary() {
+        const guestSummary = document.getElementById('guestSummary');
+        if (guestSummary) {
+            guestSummary.textContent = `${window.guests.adults} Guest${window.guests.adults > 1 ? 's' : ''}`;
+        }
+    }
+
+    // Initialize counter button states
+    updateCounterButtonStates();
+
+    // Form validation
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const checkIn = checkInPicker.selectedDates[0];
+        const checkOut = checkOutPicker.selectedDates[0];
+        const validationModal = new bootstrap.Modal(document.getElementById('validationModal'));
+        
+        if (!checkIn || !checkOut) {
+            document.getElementById('validationMessage').textContent = 'Please select both check-in and check-out dates';
+            validationModal.show();
+            return;
+        }
+
+        if (checkOut <= checkIn) {
+            document.getElementById('validationMessage').textContent = 'Check-out date must be after check-in date';
+            validationModal.show();
+            return;
+        }
+
+        const nights = Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+        if (nights > 30) {
+            document.getElementById('validationMessage').textContent = 'Maximum stay is 30 nights';
+            validationModal.show();
+            return;
+        }
+
+        this.submit();
+    });
+});
+</script>
+{% endblock %}

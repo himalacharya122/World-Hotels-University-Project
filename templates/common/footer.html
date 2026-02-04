@@ -1,0 +1,55 @@
+<footer class="footer mt-auto">
+    <div class="footer-main">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-12 col-md-4">
+                    <div class="footer-brand">
+                        <h5>World Hotels</h5>
+                        <p>Experience luxury redefined</p>
+                        <div class="footer-separator"></div>
+                    </div>
+                </div>
+                
+                <div class="col-12 col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for ('privacy') }}">Privacy Policies</a></li>
+                        <li><a href="{{ url_for ('terms') }}">Terms</a></li>
+                        <li><a href="{{ url_for ('contact') }}">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-12 col-md-4">
+                    <h5>Connect With Us</h5>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/reels/C2VREXgo0vW/" class="social-link" target="_blank">
+                            <i class="fa-brands fa-instagram"></i>
+                            <span>Instagram</span>
+                        </a>
+                        <a href="https://www.facebook.com/profile.php?id=100015216783355" class="social-link" target="_blank">
+                            <i class="fa-brands fa-facebook"></i>
+                            <span>Facebook</span>
+                        </a>
+                        <a href="https://www.instagram.com/reels/C2VREXgo0vW/" class="social-link" target="_blank">
+                            <i class="fa-brands fa-twitter"></i>
+                            <span>Twitter</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <div class="container">
+            <p>&copy; {{ now.year }} World Hotels. All rights reserved.</p>
+            <p>Made with <i class="fa-solid fa-heart heart-icon"></i> by Himal Acharya</p>
+        </div>
+    </div>
+
+    <div class="scroll-to-top d-none d-lg-flex">
+        <button id="scrollTopBtn" aria-label="Scroll to top">
+            <i class="fas fa-chevron-up"></i>
+        </button>
+    </div>
+</footer>

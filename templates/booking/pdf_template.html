@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+        <style>
+        /* Base Styles */
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #9a8a78;
+            background: #f8f9fa;
+        }
+
+        .header h1 {
+            color: #1a1a1a;
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .header p {
+            color: #666;
+            margin: 10px 0 0;
+            font-size: 16px;
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #eee;
+            background: #fff;
+            page-break-inside: avoid;
+        }
+
+        .section h3 {
+            color: #1a1a1a;
+            margin: 0 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #9a8a78;
+            font-size: 18px;
+        }
+
+        .section p {
+            margin: 10px 0;
+        }
+
+        /* Price Breakdown Styles */
+        .price-breakdown {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 3px solid #9a8a78;
+        }
+
+        .price-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .total-price {
+            border-top: 2px solid #9a8a78;
+            padding-top: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        /* Cancellation Policy Styles */
+        .cancellation-policy {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 3px solid #9a8a78;
+        }
+
+        .cancellation-policy p {
+            margin: 0;
+        }
+
+        /* QR Code Styles */
+        .qr-code {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .qr-code img {
+            display: block;
+            margin: 0 auto;
+            max-width: 150px;
+        }
+
+        /* Footer Styles */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* Utility Classes */
+        strong {
+            color: #1a1a1a;
+        }
+
+        /* Table Styles for Price Breakdown */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        td:last-child {
+            text-align: right;
+        }
+
+        /* Contact Info Styles */
+        .contact-info {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 3px solid #9a8a78;
+        }
+
+        /* Guest Info Styles */
+        .guest-info {
+            padding: 10px 0;
+        }
+
+        .guest-info + .guest-info {
+            border-top: 1px solid #eee;
+        }
+
+        /* Page Break Rules */
+        @media print {
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .header {
+                position: running(header);
+            }
+            
+            .footer {
+                position: running(footer);
+            }
+            
+            @page {
+                margin: 2cm;
+                @top-center { content: element(header) }
+                @bottom-center { content: element(footer) }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Booking Confirmation</h1>
+        <p>Booking Reference: {{ booking.booking_reference }}</p>
+    </div>
+
+    <div class="booking-details">
+        <!-- Stay Details -->
+        <div class="section">
+            <h3>Stay Details</h3>
+            <p>
+                <strong>{{ booking.hotel_name }}</strong><br>
+                {{ booking.address }}<br><br>
+                <strong>Room Type:</strong> {{ booking.type_name }}<br>
+                <strong>Check-in:</strong> {{ booking.check_in_date|date }} after {{ booking.check_in_time|time }}<br>
+                <strong>Check-out:</strong> {{ booking.check_out_date|date }} before {{ booking.check_out_time|time }}<br>
+                <strong>Duration:</strong> {{ booking.total_nights }} nights
+            </p>
+            <p>
+                <strong>Contact Information:</strong><br>
+                Phone: {{ booking.contact_number }}<br>
+                Email: {{ booking.email }}
+            </p>
+        </div>
+
+        <!-- Guest Information -->
+        <div class="section">
+            <h3>Guest Information</h3>
+            <p>
+                <strong>Primary Guest:</strong><br>
+                {{ primary_guest.guest_name }}<br>
+                {{ primary_guest.guest_email }}<br>
+                {{ primary_guest.guest_phone }}
+            </p>
+            
+            {% if additional_guests %}
+            <p>
+                <strong>Additional Guests:</strong><br>
+                {% for guest in additional_guests %}
+                • {{ guest.guest_name }}<br>
+                {% endfor %}
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Price Details -->
+        <div class="section">
+            <h3>Price Details</h3>
+            <div class="price-breakdown">
+                <div class="price-line">
+                    <span>Room Rate (per night)</span>
+                    <span>{{ (booking.total_amount / booking.total_nights)|currency }}</span>
+                </div>
+                <div class="price-line">
+                    <span>Subtotal ({{ booking.total_nights }} nights)</span>
+                    <span>{{ booking.total_amount|currency }}</span>
+                </div>
+                {% if booking.discount_amount > 0 %}
+                <div class="price-line">
+                    <span>Advance Booking Discount</span>
+                    <span>- {{ booking.discount_amount|currency }}</span>
+                </div>
+                {% endif %}
+                <div class="price-line total-price">
+                    <span>Total Paid</span>
+                    <span>{{ booking.final_amount|currency }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cancellation Policy -->
+        <div class="section">
+            <h3>Cancellation Policy</h3>
+            <div class="cancellation-policy">
+                <p>
+                    • Free cancellation until {{ cancellation_dates.free|date }}<br>
+                    • 50% charge between {{ cancellation_dates.partial|date }} and {{ cancellation_dates.free|date }}<br>
+                    • 100% charge after {{ cancellation_dates.partial|date }}
+                </p>
+            </div>
+        </div>
+
+        <!-- QR Code -->
+        <div class="qr-code">
+            <img src="{{ qr_code_url }}" alt="Booking QR Code" style="width: 150px; height: 150px;">
+            <p style="color: #666; margin-top: 10px;">Show this QR code at check-in</p>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 30px; color: #666; font-size: 12px;">
+            <p>Thank you for choosing World Hotels</p>
+            <p>This document was generated on {{ booking.booking_date|date }}</p>
+        </div>
+    </div>
+</body>
+</html>

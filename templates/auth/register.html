@@ -1,0 +1,560 @@
+{% extends 'common/base.html' %}
+
+{% block title %}Register - World Hotels{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Auth Container */
+    .auth-container {
+        min-height: calc(100vh - 76px);
+        display: flex;
+        align-items: center;
+        padding: 4rem 0;
+        background: linear-gradient(rgba(154, 138, 120, 0.1), rgba(154, 138, 120, 0.05));
+    }
+
+    /* Auth Box */
+    .auth-box {
+        background: white;
+        padding: 3rem;
+        border: 1px solid var(--accent-color);
+        max-width: 60%;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    /* Auth Title */
+    .auth-title {
+        font-family: var(--font-display);
+        color: var(--text-dark);
+        font-weight: 300;
+        font-size: 2.5rem;
+        margin-bottom: 2.5rem;
+        text-align: center;
+    }
+
+    .name-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    /* Form Controls */
+    .form-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border-radius: 0;
+        border: 1px solid #dee2e6;
+        padding: 0.75rem 1rem;
+        height: calc(2.5rem + 2px);
+        font-size: 0.95rem;
+        color: var(--text-dark);
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        border-color: var(--accent-color);
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-image: none;
+    }
+
+    .form-control.is-valid {
+        border-color: #28a745;
+        background-image: none;
+    }
+
+    .invalid-feedback {
+        display: block;
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Password Group */
+    .password-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 2.7rem;
+        cursor: pointer;
+        color: #6c757d;
+        z-index: 4;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .password-toggle i {
+        width: 20px;
+        text-align: center;
+    }
+
+    .password-toggle:hover {
+        color: var(--accent-color);
+    }
+
+    /* Password Strength Indicator */
+    .password-strength {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .strength-weak { color: #dc3545; }
+    .strength-medium { color: #ffc107; }
+    .strength-strong { color: #28a745; }
+
+    /* Update button margin */
+    .btn-register {
+        width: 100%;
+        padding: 0.75rem;
+        background: var(--primary-color);
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        border: none;
+        border-radius: 0;
+        margin: 1rem 0 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-register:hover {
+        background: var(--accent-color);
+        color: white;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Auth Links */
+    .auth-links {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    .auth-links a {
+        color: var(--accent-color);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .auth-links a:hover {
+        color: var(--primary-color);
+    }
+
+    /* Invalid Feedback */
+    .invalid-feedback {
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        color: #dc3545;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .password-toggle {
+            padding: 12px; /* Larger touch area */
+        }
+        
+        .password-toggle i {
+            font-size: 1rem;
+        }
+        .auth-container {
+            padding: 2rem 0;
+        }
+
+        .auth-box {
+            padding: 2rem 1.5rem;
+            max-width: 99%;
+        }
+
+        .auth-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .name-group {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+
+    @media (min-width: 769px) and (max-width: 991px) {
+        .auth-box {
+            padding: 2.5rem;
+            max-width: 90%;
+        }
+    }
+
+    @media (min-width: 992px) and (max-width: 1199px) {
+        .auth-box {
+            padding: 2.5rem;
+            max-width: 75% !important;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .auth-box {
+            padding: 3rem;
+            max-width: 50% !important;
+        }
+    }
+
+    .terms-group {
+        margin: 1rem 0;
+        display: flex;
+        align-items: start;
+        gap: 0.5rem;
+    }
+
+    .terms-group input[type="checkbox"] {
+        margin-top: 0.25rem;
+    }
+
+    .terms-group label {
+        font-size: 0.9rem;
+        color: #495057;
+        line-height: 1.4;
+    }
+
+    .terms-group a {
+        color: var(--accent-color);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .terms-group a:hover {
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="auth-container">
+    <div class="container">
+        <div class="auth-box">
+            <h1 class="auth-title">Create Your Account</h1>
+
+            <form method="POST" action="{{ url_for('register') }}" id="registerForm">
+                {{ form.csrf_token }}
+
+                <div class="name-group">
+                    <div class="form-group">
+                        {{ form.first_name.label(class="form-label") }}
+                        {{ form.first_name(class="form-control") }}
+                        {% if form.first_name.errors %}
+                            {% for error in form.first_name.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.last_name.label(class="form-label") }}
+                        {{ form.last_name(class="form-control") }}
+                        {% if form.last_name.errors %}
+                            {% for error in form.last_name.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control") }}
+                    {% if form.email.errors %}
+                        {% for error in form.email.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.phone.label(class="form-label") }}
+                    {{ form.phone(class="form-control") }}
+                    {% if form.phone.errors %}
+                        {% for error in form.phone.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="password-group">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-control") }}
+                    <span class="password-toggle" onclick="togglePassword('password')">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                    <div id="passwordStrength" class="password-strength"></div>
+                    {% if form.password.errors %}
+                        {% for error in form.password.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
+                <div class="password-group">
+                    {{ form.confirm_password.label(class="form-label") }}
+                    {{ form.confirm_password(class="form-control") }}
+                    <span class="password-toggle" onclick="togglePassword('confirm_password')">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                    {% if form.confirm_password.errors %}
+                        {% for error in form.confirm_password.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="terms-group">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">
+                        I agree to the <a href="{{ url_for('terms') }}" target="_blank">Terms of Service</a> and 
+                        <a href="{{ url_for('privacy') }}" target="_blank">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-register">Create Account</button>
+
+                <div class="auth-links">
+                    Already have an account? <a href="{{ url_for('login') }}">Sign In</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Toggle password visibility
+    function togglePassword(inputId) {
+        const passwordInput = document.getElementById(inputId || 'password');
+        const icon = passwordInput.parentElement.querySelector('.password-toggle i');
+        
+        // Use CSS classes to toggle visibility instead of changing input type
+        if (passwordInput.type === 'password') {
+            requestAnimationFrame(() => {
+                passwordInput.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            });
+        } else {
+            requestAnimationFrame(() => {
+                passwordInput.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            });
+        }
+    }
+
+    // Add touch event handling for better mobile response
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggles = document.querySelectorAll('.password-toggle');
+        toggles.forEach(toggle => {
+            // Prevent default touch behavior
+            toggle.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                const inputId = this.parentElement.querySelector('input').id;
+                togglePassword(inputId);
+            }, { passive: false });
+            
+            // Prevent ghost clicks
+            toggle.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+
+    // Validate single input field
+    function validateField(input, validationRules) {
+        const value = input.value.trim();
+        const errorDiv = input.nextElementSibling?.classList.contains('invalid-feedback') 
+            ? input.nextElementSibling 
+            : document.createElement('div');
+        
+        errorDiv.className = 'invalid-feedback';
+        
+        let error = '';
+        
+        switch(input.id) {
+            case 'first_name':
+            case 'last_name':
+                if (value.length < 2) {
+                    error = `${input.id === 'first_name' ? 'First' : 'Last'} name must be at least 2 characters`;
+                }
+                break;
+                
+            case 'email':
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(value)) {
+                    error = 'Please enter a valid email address';
+                }
+                break;
+                
+            case 'phone':
+                if (value) {
+                    const phoneRegex = /^\+?[\d\s-]{10,}$/;
+                    if (!phoneRegex.test(value)) {
+                        error = 'Please enter a valid phone number';
+                    }
+                }
+                break;
+                
+            case 'password':
+                const validation = validatePassword(value);
+                if (!validation.isValid) {
+                    error = 'Password must contain at least 8 characters, including uppercase, lowercase, number, and special character';
+                }
+                updatePasswordStrength(value);
+                break;
+                
+            case 'confirm_password':
+                const password = document.getElementById('password').value;
+                if (value !== password) {
+                    error = 'Passwords do not match';
+                }
+                break;
+
+            case 'terms':
+                if (!input.checked) {
+                    error = 'You must agree to the Terms of Service and Privacy Policy';
+                }
+                break;
+        }
+        
+        if (error) {
+            input.classList.add('is-invalid');
+            input.classList.remove('is-valid');
+            errorDiv.textContent = error;
+            if (!input.nextElementSibling?.classList.contains('invalid-feedback')) {
+                input.parentNode.insertBefore(errorDiv, input.nextElementSibling);
+            }
+            return false;
+        } else {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+            if (input.nextElementSibling?.classList.contains('invalid-feedback')) {
+                input.nextElementSibling.remove();
+            }
+            return true;
+        }
+    }
+
+    // Password validation
+    function validatePassword(password) {
+        const minLength = password.length >= 8;
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumbers = /\d/.test(password);
+        const hasSpecialChar = /[@$!%*?&#]/.test(password);
+        
+        return {
+            isValid: minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar,
+            strength: getPasswordStrength(password)
+        };
+    }
+
+    function getPasswordStrength(password) {
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/\d/.test(password)) strength++;
+        if (/[@$!%*?&#]/.test(password)) strength++;
+        return strength;
+    }
+
+    function updatePasswordStrength(password) {
+        const strengthDiv = document.getElementById('passwordStrength');
+        const strength = getPasswordStrength(password);
+        
+        let strengthText = '';
+        let strengthClass = '';
+        
+        if (strength <= 2) {
+            strengthText = 'Weak';
+            strengthClass = 'strength-weak';
+        } else if (strength <= 4) {
+            strengthText = 'Medium';
+            strengthClass = 'strength-medium';
+        } else {
+            strengthText = 'Strong';
+            strengthClass = 'strength-strong';
+        }
+        
+        strengthDiv.textContent = `Password Strength: ${strengthText}`;
+        strengthDiv.className = `password-strength ${strengthClass}`;
+    }
+
+    // Add real-time validation to all fields
+    document.querySelectorAll('#registerForm input').forEach(input => {
+        input.addEventListener('input', function() {
+            validateField(this);
+            
+            // If this is password field, also validate confirm password
+            if (this.id === 'password') {
+                const confirmPassword = document.getElementById('confirm_password');
+                if (confirmPassword.value) {
+                    validateField(confirmPassword);
+                }
+            }
+        });
+
+        // Also validate on blur (when leaving the field)
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+    });
+
+    // Form submission
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let isValid = true;
+        
+        // Validate all fields
+        document.querySelectorAll('#registerForm input').forEach(input => {
+            if (!validateField(input)) {
+                isValid = false;
+            }
+        });
+
+        // Validate terms checkbox
+        const termsCheckbox = document.getElementById('terms');
+        if (!termsCheckbox.checked) {
+            isValid = false;
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'invalid-feedback';
+            errorDiv.textContent = 'You must agree to the Terms of Service and Privacy Policy';
+            termsCheckbox.classList.add('is-invalid');
+            termsCheckbox.parentNode.appendChild(errorDiv);
+        }
+
+        if (isValid) {
+            this.submit();
+        }
+    });
+</script>
+{% endblock %}

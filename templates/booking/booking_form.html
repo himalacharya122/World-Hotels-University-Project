@@ -1,0 +1,635 @@
+<!-- templates/booking/booking_form.html -->
+{% extends 'common/base.html' %}
+
+{% block title %}Complete Your Booking - World Hotels{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Container and Progress Bar */
+.booking-page-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+/* Remove background from booking-container since it's now on the wrapper */
+.booking-container {
+    max-width: 1140px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+    .booking-page-wrapper {
+        padding: 1rem 0;
+    }
+}
+
+/* Progress Bar Styles */
+.booking-progress {
+    max-width: 800px;
+    margin: 0 auto 3rem;
+    position: relative;
+    padding: 2rem 0;
+}
+
+.progress-bar {
+    position: absolute;
+    top: 50%;
+    left: 15%;
+    right: 15%;
+    height: 3px;
+    transform: translateY(-50%);
+    background: #dee2e6;
+    z-index: 1;
+}
+
+.progress-bar::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 66%;
+    background: #9D8E7C;
+    transition: width 0.3s ease;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+}
+
+.progress-step {
+    text-align: center;
+    flex: 1;
+    position: relative;
+}
+
+.step-icon {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 3;
+}
+
+.step-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+.progress-step.completed .step-icon {
+    background: #9D8E7C;
+    border-color: #9D8E7C;
+    color: white;
+}
+
+.progress-step.active .step-icon {
+    border-color: #9D8E7C;
+    color: #9D8E7C;
+    font-weight: 600;
+}
+
+/* Add box shadow for better depth */
+.progress-step.active .step-icon {
+    box-shadow: 0 0 0 4px rgba(157, 142, 124, 0.1);
+}
+
+@media (max-width: 576px) {
+    .progress-bar {
+        left: 20%;
+        right: 20%;
+    }
+    
+    .step-label {
+        font-size: 0.75rem;
+    }
+    
+    .step-icon {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+/* Form Sections */
+.form-section {
+    background: white;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #9A8A78;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.form-section h4 {
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+/* Guest Form */
+.guest-form {
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid #9A8A78;
+}
+
+.guest-form h6 {
+    margin-bottom: 1rem;
+    color: #495057;
+}
+
+/* Payment Methods */
+.payment-methods {
+    display: grid;
+    gap: 1rem;
+}
+
+.payment-method {
+    border: 1px solid #9A8A78;
+    padding: 1.25rem;
+    border-radius: 0;
+    transition: all 0.3s ease;
+}
+
+.payment-method.selected {
+    border-color: #9D8E7C;
+    background: rgba(157, 142, 124, 0.05);
+}
+
+.payment-method-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.payment-method-icon {
+    font-size: 1.5rem;
+    color: #9D8E7C;
+}
+
+.payment-logos {
+    display: flex;
+    gap: 1rem;
+    height: 2rem;
+    margin-top: 1rem;
+}
+
+/* Booking Summary */
+.booking-summary {
+    background: white;
+    padding: 1.5rem;
+    border: 1px solid #9A8A78;
+    position: sticky;
+    top: 2rem;
+}
+
+.booking-summary h4 {
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 1.25rem;
+    font-size: 1.25rem;
+}
+
+.booking-summary h5 {
+    font-family: 'Playfair Display', serif;
+    color: #333;
+}
+
+/* Price Breakdown */
+.price-breakdown {
+    margin: 1rem 0;
+    font-size: 0.95rem;
+}
+
+.price-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    color: #666;
+}
+
+.total-price {
+    border-top: 1px solid #9A8A78;
+    padding-top: 0.75rem;
+    margin-top: 0.75rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Info Box Styles */
+.info-box {
+    background: rgba(154, 138, 120, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid #9A8A78;
+    position: relative;
+}
+
+.info-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(154, 138, 120, 0.05), transparent);
+    pointer-events: none;
+}
+
+.info-box i {
+    color: #9A8A78;
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+}
+
+.info-box ul {
+    list-style: none;
+    padding-left: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+
+.info-box li {
+    margin-bottom: 0.75rem;
+    color: #666;
+    position: relative;
+}
+
+.info-box li:last-child {
+    margin-bottom: 0;
+}
+
+.info-box li::before {
+    content: '•';
+    color: #9A8A78;
+    position: absolute;
+    left: -1rem;
+    font-weight: bold;
+}
+
+/* Form Controls */
+.form-control {
+    border-radius: 0;
+    padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+    border-color: #9D8E7C;
+    box-shadow: none;
+}
+
+.form-check-label {
+    font-size: 0.9rem;
+    color: #495057;
+    line-height: 1.4;
+}
+
+.form-check-label a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.form-check-label a:hover {
+    color: var(--primary-color);
+}
+
+/* Button Styles */
+.btn-dark {
+    background: #000;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+    border-radius: 0;
+}
+
+.btn-dark:hover {
+    background: #9D8E7C;
+}
+
+@media (max-width: 991px) {
+    .booking-summary {
+        position: static;
+        margin-top: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="booking-page-wrapper">
+    <div class="container py-4">
+    <!-- Booking Progress -->
+        <div class="booking-progress">
+            <div class="progress-bar"></div>
+            <div class="progress-steps">
+                <div class="progress-step completed">
+                    <div class="step-icon">1</div>
+                    <div class="step-label">Room Selection</div>
+                </div>
+                <div class="progress-step active">
+                    <div class="step-icon">2</div>
+                    <div class="step-label">Guest Details</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-icon">3</div>
+                    <div class="step-label">Confirmation</div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <!-- Booking Form -->
+            <div class="col-lg-8">
+                <form id="bookingForm" action="{{ url_for('process_booking') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <!-- Hidden Fields -->
+                    <input type="hidden" name="hotel_id" value="{{ hotel.hotel_id }}">
+                    <input type="hidden" name="room_id" value="{{ room.room_id }}">
+                    <input type="hidden" name="check_in" value="{{ check_in.strftime('%Y-%m-%d') }}">
+                    <input type="hidden" name="check_out" value="{{ check_out.strftime('%Y-%m-%d') }}">
+                    <input type="hidden" name="total_guests" value="{{ total_guests }}">
+                    <input type="hidden" name="total_amount" value="{{ total_price }}">
+                    <input type="hidden" name="currency" value="{{ selected_currency }}">
+
+                    <!-- Primary Guest Details -->
+                    <div class="form-section">
+                        <h4>Primary Guest Details</h4>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" 
+                                    class="form-control" 
+                                    name="primary_guest_name"
+                                    required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email *</label>
+                                <input type="email" 
+                                    class="form-control" 
+                                    name="primary_guest_email"
+                                    required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number *</label>
+                                <input type="tel" 
+                                    class="form-control" 
+                                    name="primary_guest_phone"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Guests -->
+                    {% if total_guests > 1 %}
+                    <div class="form-section">
+                        <h4>Additional Guests</h4>
+                        {% for i in range(1, total_guests) %}
+                        <div class="guest-form">
+                            <h6>Guest {{ i + 1 }}</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Full Name *</label>
+                                    <input type="text" 
+                                        class="form-control" 
+                                        name="guest_name_{{ i }}"
+                                        required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" 
+                                        class="form-control" 
+                                        name="guest_email_{{ i }}">
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Special Requests -->
+                    <div class="form-section">
+                        <h4>Special Requests</h4>
+                        <textarea class="form-control" 
+                                name="special_requests" 
+                                rows="3"
+                                placeholder="Any special requests? (optional)"></textarea>
+                        <small class="text-muted">
+                            We'll do our best to accommodate your requests but cannot guarantee them.
+                        </small>
+                    </div>
+
+                    <!-- Payment Information -->
+                    <div class="form-section">
+                        <h4>Payment Information</h4>
+                        <div class="payment-methods">
+                            <!-- Credit Card -->
+                            <div class="payment-method selected" onclick="selectPayment('card')">
+                                <div class="payment-method-header">
+                                    <input type="radio" name="payment_method" value="card" checked>
+                                    <i class="fas fa-credit-card payment-method-icon"></i>
+                                    <label>Credit/Debit Card</label>
+                                </div>
+                                <div class="card-form">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Card Number *</label>
+                                            <input type="text" class="form-control" name="card_number" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Expiry *</label>
+                                            <input type="text" class="form-control" name="card_expiry" placeholder="MM/YY" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">CVV *</label>
+                                            <input type="text" class="form-control" name="card_cvv" required>
+                                        </div>
+                                    </div>
+                                    <div class="payment-logos">
+                                        <img src="/static/images/visa.png" alt="Visa">
+                                        <img src="/static/images/mastercard.png" alt="Mastercard">
+                                        <img src="/static/images/amex.png" alt="American Express">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PayPal -->
+                            <div class="payment-method disabled" onclick="alert('PayPal payment is currently unavailable')">
+                                <div class="payment-method-header">
+                                    <input type="radio" name="payment_method" value="paypal" disabled>
+                                    <i class="fas fa-paypal payment-method-icon"></i>
+                                    <label>PayPal</label>
+                                </div>
+                                <small class="text-muted">Coming soon</small>
+                            </div>
+
+                            <!-- Google Pay -->
+                            <div class="payment-method disabled" onclick="alert('Google Pay is currently unavailable')">
+                                <div class="payment-method-header">
+                                    <input type="radio" name="payment_method" value="googlepay" disabled>
+                                    <i class="fas fa-google payment-method-icon"></i>
+                                    <label>Google Pay</label>
+                                </div>
+                                <small class="text-muted">Coming soon</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="form-section">
+                        <div class="form-check">
+                            <input type="checkbox" 
+                                class="form-check-input" 
+                                id="terms" 
+                                required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="{{ url_for('terms') }}" target="_blank">booking terms</a> and cancellation policy
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-dark mt-3">
+                            Complete Booking
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Booking Summary -->
+            <div class="col-lg-4">
+                <div class="booking-summary">
+                    <h4>Booking Summary</h4>
+                    
+                    <!-- Hotel & Room Info -->
+                    <div class="mb-3">
+                        <h5>{{ hotel.hotel_name }}</h5>
+                        <p class="mb-1">{{ room.type_name }} Room</p>
+                        <small class="text-muted">
+                            {{ check_in|date }} - {{ check_out|date }}
+                            ({{ total_nights }} {% if total_nights != 1 %}nights{% else %}night{% endif %})
+                        </small>
+                    </div>
+
+                    <!-- Guests -->
+                    <div class="mb-3">
+                        <i class="fas fa-users"></i>
+                        {{ total_guests }} {% if total_guests != 1 %}guests{% else %}guest{% endif %}
+                    </div>
+
+                    <!-- Price Breakdown -->
+                    <div class="price-breakdown">
+                        <div class="price-line">
+                            <span>Room Rate (per night)</span>
+                            <span>{{ room.base_price|currency(selected_currency) }}</span>
+                        </div>
+                        {% if room.extra_guest_charge > 0 %}
+                        <div class="price-line">
+                            <span>Extra Guest Charge</span>
+                            <span>+ {{ room.extra_guest_charge|currency(selected_currency) }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="price-line">
+                            <span>Subtotal ({{ total_nights }} {% if total_nights != 1 %}nights{% else %}night{% endif %})</span>
+                            <span>{{ subtotal|currency(selected_currency) }}</span>
+                        </div>
+                        {% if discount_amount > 0 %}
+                        <div class="price-line text-success">
+                            <span>
+                                Advance Booking Discount 
+                                ({{ discount_percentage }}%)
+                            </span>
+                            <span>- {{ discount_amount|currency(selected_currency) }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="price-line total-price">
+                            <strong>Total</strong>
+                            <strong>{{ total_price|currency(selected_currency) }}</strong>
+                        </div>
+                    </div>
+
+                    <!-- Cancellation Policy -->
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i> Cancellation Policy
+                        <ul class="mb-0">
+                            <li>Free cancellation up to 60 days before check-in</li>
+                            <li>50% charge between 30-60 days before check-in</li>
+                            <li>100% charge within 30 days of check-in</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('bookingForm');
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // Card number formatting
+    const cardInput = document.querySelector('input[name="card_number"]');
+    cardInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        value = value.replace(/(.{4})/g, '$1 ').trim();
+        e.target.value = value;
+    });
+
+    // Expiry date formatting
+    const expiryInput = document.querySelector('input[name="card_expiry"]');
+    expiryInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length >= 2) {
+            value = value.slice(0,2) + '/' + value.slice(2,4);
+        }
+        e.target.value = value;
+    });
+
+    // CVV validation
+    const cvvInput = document.querySelector('input[name="card_cvv"]');
+    cvvInput.addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0,3);
+    });
+
+    function selectPayment(method) {
+        if (method === 'card') {
+            document.querySelectorAll('.payment-method').forEach(pm => {
+                pm.classList.remove('selected');
+            });
+            document.querySelector(`.payment-method:first-child`).classList.add('selected');
+        }
+    }
+
+    document.querySelectorAll('.payment-method.disabled').forEach(pm => {
+        pm.style.opacity = '0.6';
+        pm.style.cursor = 'not-allowed';
+    });
+});
+</script>
+{% endblock %}

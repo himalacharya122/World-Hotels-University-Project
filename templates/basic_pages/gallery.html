@@ -1,0 +1,674 @@
+{% extends 'common/base.html' %}
+
+{% block title %}Gallery - World Hotels{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section */
+    .gallery-hero {
+        height: 400px;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                    url('{{ url_for("static", filename="images/gallery/gallery-hero.jpg") }}');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: var(--text-light);
+    }
+
+    .hero-content h1 {
+        font-family: var(--font-display);
+        font-size: 3.5rem;
+        font-weight: 300;
+        margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin: 0 auto;
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+
+    /* Featured Section */
+    .featured-section {
+        padding: 4rem 0;
+        background-color: #f8f9fa;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .featured-card {
+        background-color: white;
+        border: none;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    .featured-content {
+        padding: 2rem;
+    }
+
+    .featured-image {
+        position: relative;
+        height: 450px;
+        overflow: hidden;
+    }
+
+    .featured-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .subtitle {
+        font-size: 0.8rem;
+        color: var(--accent-color);
+        letter-spacing: 2px;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    .featured-title {
+        font-size: 2rem;
+        font-weight: 300;
+        color: #333;
+        margin-bottom: 1rem;
+        font-family: var(--font-display);
+        line-height: 1.2;
+    }
+
+    .featured-description {
+        font-size: 1rem;
+        color: #666;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+    }
+
+    .discover-more {
+        display: inline-block;
+        color: #666;
+        text-decoration: none;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-bottom: 1px solid #666;
+        padding-bottom: 3px;
+        transition: all 0.3s ease;
+    }
+
+    .discover-more:hover {
+        color: #333;
+        border-color: #333;
+    }
+
+    /* Gallery Section */
+    .gallery-section {
+        padding: 4rem 0;
+        background: #fff;
+    }
+
+    /* Filter Buttons */
+    .gallery-filters {
+        margin-bottom: 3rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding: 0 1rem;
+    }
+
+    .filter-btn {
+        padding: 0.75rem 1.5rem;
+        border: 1px solid var(--accent-color);
+        background: transparent;
+        color: var(--accent-color);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+        background: var(--accent-color);
+        color: white;
+    }
+
+    /* Gallery Cards */
+    .gallery-card {
+        background: white;
+        border: none;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        transition: transform 0.3s ease;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .hotel-image-container {
+        height: 300px;
+        overflow: hidden;
+    }
+
+    .hotel-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hotel-details {
+        padding: 1.5rem;
+    }
+
+    .hotel-location {
+        font-size: 0.9rem;
+        color: var(--accent-color);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .hotel-name {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        font-family: var(--font-display);
+        color: var(--text-dark);
+    }
+
+    .hotel-description {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .hotel-footer {
+        margin-top: auto;
+    }
+
+    .hotel-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: var(--accent-color);
+        color: white;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    /* Updated Lightbox Styles */
+    .lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.95);
+        display: none;
+        z-index: 1050;
+        padding: 1rem;
+    }
+
+    .lightbox.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .lightbox-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .lightbox-content img {
+        max-width: 100%;
+        max-height: calc(100vh - 120px);
+        object-fit: contain;
+    }
+
+    .lightbox-nav {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.3);
+        border: none;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        z-index: 1055;
+    }
+
+    .lightbox-nav.prev {
+        left: 1rem;
+    }
+
+    .lightbox-nav.next {
+        right: 1rem;
+    }
+
+    .lightbox-nav:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Updated Lightbox Close Button */
+    .lightbox-close {
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 1060;
+    }
+
+    .lightbox-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .lightbox-close::before {
+        font-family: Arial, sans-serif;
+        font-weight: 300;
+        line-height: 1;
+    }
+
+    /* Media Queries for Lightbox */
+    @media (max-width: 768px) {
+        .lightbox {
+            padding: 0.5rem;
+        }
+
+        .lightbox-content {
+            gap: 0.5rem;
+        }
+
+        .lightbox-nav {
+            width: 35px;
+            height: 35px;
+            font-size: 1.2rem;
+        }
+
+        .lightbox-nav.prev {
+            left: 0.5rem;
+        }
+
+        .lightbox-nav.next {
+            right: 0.5rem;
+        }
+
+
+        .lightbox-content img {
+            max-height: calc(100vh - 80px);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .lightbox-nav {
+            width: 30px;
+            height: 30px;
+            font-size: 1rem;
+        }
+
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 991px) {
+        .featured-content {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .featured-image {
+            height: 350px;
+        }
+
+        .hotel-image-container {
+            height: 200px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            padding: 0 1rem;
+            max-width: 100%;
+        }
+
+        .featured-section {
+            padding: 2rem 0;
+        }
+
+        .featured-title {
+            font-size: 1.8rem;
+        }
+
+        .featured-description {
+            font-size: 0.9rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .hotel-name {
+            font-size: 1.3rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            padding: 0 1rem;
+            max-width: 100%;
+        }
+
+        .gallery-hero {
+            height: 300px;
+        }
+
+        .featured-image {
+            height: 250px;
+        }
+
+        .hotel-image-container {
+            height: 180px;
+        }
+
+        .hotel-details {
+            padding: 1rem;
+        }
+    }
+
+
+
+    /* Pagination Styles */
+    .pagination-container {
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: white;
+        padding: 0.5rem;
+        border-radius: 50px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    .page-numbers {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .page-btn, .page-number {
+        min-width: 40px;
+        height: 40px;
+        border: none;
+        background: transparent;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+        cursor: pointer;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .page-btn {
+        background: #f8f9fa;
+    }
+
+    .page-btn:hover, .page-number:hover {
+        background: var(--accent-color);
+        color: white;
+    }
+
+    .page-number.active {
+        background: var(--accent-color);
+        color: white;
+    }
+
+    .page-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    @media (max-width: 576px) {
+        .page-btn, .page-number {
+            min-width: 35px;
+            height: 35px;
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="gallery-hero">
+    <div class="hero-content">
+        <h1>Experience the World</h1>
+        <p class="hero-subtitle">Explore our curated collection of luxury hotels and experiences.</p>
+    </div>
+</section>
+
+<!-- Featured Section -->
+<div class="featured-section">
+    <div class="container">
+        <div class="featured-card">
+            <div class="row align-items-center">
+                <div class="col-lg-5">
+                    <div class="featured-content">
+                        <div class="subtitle">FEATURED GALLERY</div>
+                        <h2 class="featured-title">Capturing Luxury Moments</h2>
+                        <p class="featured-description">Explore beautiful photos of our luxury homes, showcasing stylish interiors, cozy spaces, and breathtaking views that define true elegance.</p>
+                        <a href="#gallery-grid" class="discover-more">View Gallery</a>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="featured-image">
+                        <img src="{{ url_for('static', filename='images/gallery/gallery-featured.jpg') }}" alt="Featured Gallery Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gallery Grid Section -->
+<section class="gallery-section" id="gallery-grid">
+    <div class="container">
+        <!-- Dynamic Category Filters -->
+        <div class="gallery-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            {% for category in categories %}
+                <button class="filter-btn" data-filter="{{ category.category|lower }}">
+                    {{ category.category|title }}
+                </button>
+            {% endfor %}
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="row">
+            {% for item in gallery_items %}
+            <div class="col-md-6 col-lg-4 mb-4" data-category="{{ item.category|lower }}">
+                <div class="hotel-card gallery-card">
+                    <div class="hotel-image-container">
+                        <img src="{{ item.image_url }}" 
+                             class="hotel-image"
+                             alt="{{ item.title }}"
+                             loading="lazy">
+                    </div>
+                    <div class="hotel-details">
+                        {% if item.category %}
+                            <div class="hotel-location">{{ item.category|title }}</div>
+                        {% endif %}
+                        <h3 class="hotel-name">{{ item.title }}</h3>
+                        {% if item.description %}
+                            <p class="hotel-description">{{ item.description }}</p>
+                        {% endif %}
+                        {% if item.hotel_name %}
+                            <div class="hotel-footer">
+                                <span class="hotel-badge">{{ item.hotel_name }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+                <div class="col-12 text-center">
+                    <p>No gallery items available at the moment.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Pagination -->
+<div class="pagination-container">
+    <div class="pagination">
+        <button class="page-btn prev-page" aria-label="Previous page">&lt;</button>
+        <div class="page-numbers">
+            
+        </div>
+        <button class="page-btn next-page" aria-label="Next page">&gt;</button>
+    </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox">
+    <div class="lightbox-content">
+        <button class="lightbox-nav prev" aria-label="Previous image">&lt;</button>
+        <img src="" alt="Gallery image">
+        <button class="lightbox-nav next" aria-label="Next image">&gt;</button>
+    </div>
+    <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter functionality
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const galleryItems = document.querySelectorAll('[data-category]'); // Changed selector
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Update active button
+            filterBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            // Filter items
+            const filter = this.dataset.filter;
+            galleryItems.forEach(item => {
+                if (filter === 'all' || item.dataset.category === filter) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Lightbox functionality
+    const lightbox = document.querySelector('.lightbox');
+    const lightboxImg = lightbox.querySelector('img');
+    const lightboxClose = lightbox.querySelector('.lightbox-close');
+    const prevBtn = lightbox.querySelector('.prev');
+    const nextBtn = lightbox.querySelector('.next');
+    const galleryCards = document.querySelectorAll('.gallery-card');
+    let currentImageIndex = 0;
+    
+    function showImage(index) {
+        const visibleCards = Array.from(galleryCards).filter(card => {
+            const container = card.closest('[data-category]');
+            return container.style.display !== 'none';
+        });
+        
+        currentImageIndex = (index + visibleCards.length) % visibleCards.length;
+        const imgSrc = visibleCards[currentImageIndex].querySelector('img').src;
+        lightboxImg.src = imgSrc;
+    }
+
+    galleryCards.forEach((card, index) => {
+        card.addEventListener('click', function() {
+            currentImageIndex = index;
+            showImage(currentImageIndex);
+            lightbox.classList.add('active');
+        });
+    });
+
+    // Navigation buttons
+    prevBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showImage(currentImageIndex - 1);
+    });
+
+    nextBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showImage(currentImageIndex + 1);
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('active')) return;
+        
+        if (e.key === 'ArrowLeft') {
+            showImage(currentImageIndex - 1);
+        } else if (e.key === 'ArrowRight') {
+            showImage(currentImageIndex + 1);
+        } else if (e.key === 'Escape') {
+            lightbox.classList.remove('active');
+        }
+    });
+
+    lightboxClose.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+    });
+
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+            lightbox.classList.remove('active');
+        }
+    });
+});
+</script>
+{% endblock %}

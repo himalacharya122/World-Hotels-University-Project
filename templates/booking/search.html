@@ -1,0 +1,877 @@
+{% extends 'common/base.html' %}
+
+{% block title %}Search Hotels - World Hotels{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
+
+<style> 
+    /* Header Styling */
+    .search-header {
+        padding: 4rem 0 2rem;
+        text-align: left;
+    }
+
+    .search-subtitle {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: #9D8E7C;
+        display: block;
+        margin-bottom: 1rem;
+    }
+
+    .search-title {
+        font-size: 2.5rem;
+        font-weight: 300;
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .header-separator {
+        width: 50px;
+        height: 1px;
+        background-color: #9D8E7C;
+        margin: 0 0 1.5rem;
+        text-align: left;
+    }
+
+    .search-description {
+        font-size: 1.1rem;
+        color: #666;
+        max-width: 600px;
+        margin: 0; 
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        .search-header {
+            padding: 3rem 1rem 1.5rem;
+            text-align: center !important;
+        }
+
+        .search-title {
+            font-size: 2rem;
+        }
+
+        .search-description {
+            font-size: 1rem;
+            padding: 0 1rem;
+            margin: 0 auto !important;
+        }
+        
+        .header-separator {
+            margin: 0 auto 1.5rem !important;
+        }
+    }
+
+
+    .search-module {
+        background: #F8F9FA;
+        width: 100%;
+        padding: 4rem 0;
+        margin: 2rem 0;
+    }
+
+    .search-box {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    @media (max-width: 768px) {
+        .search-module {
+            padding: 2rem 0;
+            margin: 2rem 0;
+        }
+    }
+
+    .form-control,
+    .btn,
+    .dropdown-menu,
+    .flatpickr-calendar {
+        border-radius: 0 !important;
+    }
+
+    /* Form Controls and Inputs */
+    .form-control,
+    .btn,
+    .dropdown-toggle {
+        height: 55px !important;
+        padding: 0.75rem 1.25rem !important;
+        font-size: 1rem !important;
+        line-height: 1.5 !important;
+    }
+
+    .form-control:focus {
+        border-color: #9D8E7C;
+        box-shadow: none;
+    }
+
+    /* Form Labels */
+    .form-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #495057;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Dropdown Styling */
+    .dropdown-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        border-bottom: 1px solid #dadada;
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .city-option, .currency-option {
+        color: #495057;
+        font-size: 0.95rem;
+    }
+
+    /* Custom scrollbar for long lists */
+    .dropdown-menu {
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 0.5rem 0;
+        border: 1px solid var(--accent-color);
+    }
+
+    .dropdown-menu::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .dropdown-menu::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .dropdown-menu::-webkit-scrollbar-thumb {
+        background: #9D8E7C;
+    }
+
+    .dropdown-menu::-webkit-scrollbar-thumb:hover {
+        background: #8a7d6d;
+    }
+
+
+    /* Date Input Container */
+    .date-input-container {
+        position: relative;
+    }
+
+    .date-input-container i {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9D8E7C;
+        font-size: 1.1rem
+    }
+
+    .date-range-info {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+
+    /* Guest Dropdown */
+    .dropdown-toggle {
+        background: white;
+        text-align: left;
+        position: relative;
+        padding-right: 2rem;
+    }
+
+    .dropdown-toggle::after {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .guest-dropdown {
+        width: 100%;
+        border-radius: 0;
+        border: none;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        border: none;
+    }
+
+    .guest-counter {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+    }
+
+    .counter-btn {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #dee2e6;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .counter-btn:hover:not(:disabled) {
+        background: #9D8E7C;
+        color: white;
+        border-color: #9D8E7C;
+    }
+
+    .counter-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Room Type Info */
+    .room-type-info {
+        border-top: 1px solid #dee2e6;
+        padding-top: 1rem;
+    }
+
+    /* Search Button */
+    .btn-dark {
+        height: 55px !important;
+        border-radius: 0;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        background: #000;
+        border: none;
+    }
+
+    .btn-dark:hover {
+        background: #9D8E7C;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Price Estimate Box */
+    .price-estimate {
+        background: white;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border: 1px solid #dee2e6;
+        display: none;
+    }
+
+    .price-estimate h6 {
+        color: #495057;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    #priceRange {
+        font-size: 1.25rem;
+        color: #9D8E7C;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+
+    @media (max-width: 768px) {
+        .search-box {
+            padding: .5rem 1rem;
+            margin: 1rem 0;
+        }
+
+        .form-control,
+        .btn,
+        .dropdown-toggle {
+            height: 50px !important;
+        }
+
+        .guest-dropdown {
+            width: 100%;
+        }
+
+        .btn-dark {
+            width: 100%;
+        }
+    }
+
+
+    .recommended-hotels {
+        padding: 4rem 0;
+    }
+
+    .recommended-hotels h2 {
+        font-family: var(--font-display);
+        font-weight: 300;
+        color: var(--text-dark);
+        margin-bottom: 2rem;
+        font-size: 2.2rem;
+    }
+
+    .card {
+        transition: var(--transition);
+        height: 100%;
+        border-radius: 0 !important;
+        border: none;
+        border: 1px solid #dee2e6;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        padding: 1.5rem;
+    }
+
+    .card-title {
+        font-family: var(--font-display);
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-dark);
+        font-weight: 400;
+    }
+
+    .card-subtitle {
+        font-family: var(--font-accent);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent-color);
+        margin-bottom: 1rem;
+    }
+
+    .card-text {
+        font-family: var(--font-primary);
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .card-text small {
+        font-family: var(--font-accent);
+        font-size: 0.85rem;
+        color: var(--accent-color);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-outline-dark {
+        font-family: var(--font-accent);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+        padding: 0.75rem 1.5rem;
+        border: 1px solid var(--text-dark);
+        transition: var(--transition);
+    }
+
+    .btn-outline-dark:hover {
+        background-color: var(--text-dark);
+        color: var(--text-light);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .card-img-top {
+        height: 250px;
+        object-fit: cover;
+        border-radius: 0 !important;
+    }
+
+    @media (max-width: 768px) {
+        .recommended-hotels h2 {
+            font-size: 1.8rem;
+            text-align: center;
+        }
+        
+        .card-img-top {
+            height: 200px;
+        }
+    }
+
+    /* Validation Modal */
+
+    .modal-content {
+        border-radius: 0;
+        border: 1px solid var(--accent-color);
+    }
+
+    .modal-header {
+        border-radius: 0;
+        background: #f8f9fa;
+        border-bottom: 1px solid var(--accent-color);
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-footer {
+        border-radius: 0;
+        border-top: 1px solid #dee2e6;
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .btn-close {
+        border-radius: 0;
+    }
+
+    .modal .btn {
+        border-radius: 0;
+        padding: 0.75rem 1.5rem;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="search-header">
+        <span class="search-subtitle">Find Your Perfect Stay</span>
+        <h1 class="search-title">Search Our Luxury Hotels</h1>
+        <div class="header-separator"></div>
+        <p class="search-description">Discover amazing places to stay in the best destinations.</p>
+    </div>
+</div>
+<div class="search-module">
+    <div class="container">
+        <div class="search-box">
+            <form id="searchForm" method="GET" action="{{ url_for('hotel_list') }}" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="row g-3">
+                    <!-- Destination -->
+                    <div class="col-md-3">
+                        <label class="form-label">Destination</label>
+                        <div class="dropdown">
+                            <button class="form-control text-start dropdown-toggle" 
+                                    type="button" 
+                                    data-bs-toggle="dropdown">
+                                <span id="destinationSummary">Select city</span>
+                            </button>
+                            
+                            <div class="dropdown-menu guest-dropdown p-3">
+                                <div class="dropdown-item city-option" 
+                                    data-value="all"
+                                    data-capacity="0"
+                                    data-standard-price="0">
+                                    All Cities
+                                </div>
+                            {% for city in cities %}
+                                <div class="dropdown-item city-option" 
+                                    data-value="{{ city.city }}"
+                                    data-capacity="{{ city.capacity }}"
+                                    data-standard-price="{{ city.standard_room_price }}">
+                                    {{ city.city }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <input type="hidden" name="city" id="cityInput" required>
+                    <div class="invalid-feedback">Please select a destination</div>
+                </div>
+
+                <!-- Check In -->
+                <div class="col-md-3">
+                    <label class="form-label">Check In</label>
+                    <div class="date-input-container">
+                        <input type="text" 
+                            class="form-control datepicker" 
+                            name="check_in" 
+                            required 
+                            placeholder="Select date">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="date-range-info">Book up to 3 months in advance</div>
+                </div>
+
+                <!-- Check Out -->
+                <div class="col-md-3">
+                    <label class="form-label">Check Out</label>
+                    <div class="date-input-container">
+                        <input type="text" 
+                            class="form-control datepicker" 
+                            name="check_out" 
+                            required 
+                            placeholder="Select date">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="date-range-info">Maximum stay: 30 days</div>
+                </div>
+
+                <!-- Guests -->
+                <div class="col-md-3">
+                    <label class="form-label">Guests</label>
+                    <div class="dropdown">
+                        <button class="form-control text-start dropdown-toggle" 
+                                type="button" 
+                                data-bs-toggle="dropdown">
+                            <span id="guestSummary">1 Guest</span>
+                        </button>
+                        <div class="dropdown-menu guest-dropdown p-3">
+                            <div class="guest-counter mb-3">
+                                <span>Adults</span>
+                                <div class="d-flex align-items-center">
+                                    <button type="button" class="counter-btn" onclick="updateGuests('adults', -1)">-</button>
+                                    <span id="adultsCount" class="mx-3">1</span>
+                                    <button type="button" class="counter-btn" onclick="updateGuests('adults', 1)">+</button>
+                                </div>
+                            </div>
+                            <div class="room-type-info mt-3">
+                                <small class="text-muted">
+                                    Standard: 1 guest<br>
+                                    Double: 2 guests (20% extra)<br>
+                                    Family: up to 4 guests (50% extra)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="adults" id="adultsInput" value="1">
+                </div>
+
+                <!-- Currency -->
+                <div class="col-md-3">
+                    <label class="form-label">Currency</label>
+                    <div class="dropdown">
+                        <button class="form-control text-start dropdown-toggle" 
+                                type="button" 
+                                data-bs-toggle="dropdown">
+                            <span id="currencySummary">
+                                {% for currency in currencies %}
+                                    {% if currency.code == selected_currency %}
+                                        {{ currency.code }} ({{ currency.symbol }})
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                        </button>
+                        <div class="dropdown-menu guest-dropdown p-3">
+                            {% for currency in currencies %}
+                                <div class="dropdown-item currency-option" 
+                                    data-code="{{ currency.code }}"
+                                    data-symbol="{{ currency.symbol }}">
+                                    {{ currency.code }} ({{ currency.symbol }})
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <input type="hidden" name="currency" id="currencyInput" value="{{ selected_currency }}">
+                </div>
+
+                <!-- Search Button -->
+                <div class="col-12">
+                    <button type="submit" class="btn btn-dark px-5">Search Hotels</button>
+                </div>
+            </div>
+
+            <!-- Price Estimate Box -->
+            <div class="price-estimate mt-4" id="priceEstimate">
+                <h6>Estimated Price Range</h6>
+                <div id="priceRange"></div>
+                <small class="text-muted">
+                    * Final price may vary based on room type and seasonal rates
+                </small>
+            </div>
+        </form>
+        <!-- Validation Modal -->
+        <div class="modal fade" id="validationModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Required Fields</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="validationMessage"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recommended Hotels Section -->
+<section class="recommended-hotels mt-5">
+    <div class="container">
+        <h2 class="mb-4">Recommended Hotels</h2>
+        <div class="row">
+            {% for hotel in recommended_hotels %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if hotel.hotel_image %}
+                    <img src="{{ hotel.hotel_image }}" 
+                         class="card-img-top" 
+                         alt="{{ hotel.hotel_name }}" 
+                         style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='images/placeholder-hotel.jpg') }}" 
+                             alt="{{ hotel.hotel_name }}" 
+                             class="card-img-top" 
+                             style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ hotel.hotel_name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ hotel.city }}</h6>
+                        <p class="card-text">{{ hotel.description|truncate(100) }}</p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                From {{ hotel.starting_price|currency(selected_currency) }} per night
+                            </small>
+                        </p>
+                        <div class="mt-auto">
+                            <a href="{{ url_for('hotel_details', hotel_id=hotel.hotel_id) }}" 
+                               class="btn btn-outline-dark w-100">
+                                <i class="fas fa-info-circle me-2"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Flatpickr for check-in
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 90); // 3 months advance booking limit
+
+    const commonConfig = {
+        disableMobile: "true",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "F j, Y",
+        allowInput: false
+    };
+
+    const checkInPicker = flatpickr('input[name="check_in"]', {
+        ...commonConfig,
+        minDate: today,
+        maxDate: maxDate,
+        onChange: function(selectedDates) {
+            if (selectedDates[0]) {
+                const minCheckOut = new Date(selectedDates[0]);
+                minCheckOut.setDate(minCheckOut.getDate() + 1);
+                
+                const maxCheckOut = new Date(selectedDates[0]);
+                maxCheckOut.setDate(maxCheckOut.getDate() + 30);
+                
+                checkOutPicker.set('minDate', minCheckOut);
+                checkOutPicker.set('maxDate', maxCheckOut);
+                
+                checkOutPicker.clear();
+                setTimeout(() => checkOutPicker.open(), 100);
+            }
+            updatePriceEstimate();
+        }
+    });
+
+    // Initialize Flatpickr for check-out
+    const checkOutPicker = flatpickr('input[name="check_out"]', {
+        ...commonConfig,
+        onChange: updatePriceEstimate
+    });
+
+    // Setup city dropdown
+    document.querySelectorAll('.city-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const value = this.dataset.value;
+            document.getElementById('destinationSummary').textContent = value;
+            document.getElementById('cityInput').value = value;
+            // Close the dropdown
+            const dropdownMenu = this.closest('.dropdown-menu');
+            dropdownMenu.classList.remove('show');
+            updatePriceEstimate();
+        });
+    });
+
+    // Setup currency dropdown
+    document.querySelectorAll('.currency-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const code = this.dataset.code;
+            document.getElementById('currencySummary').textContent = this.textContent;
+            document.getElementById('currencyInput').value = code;
+            // Close the dropdown
+            const dropdownMenu = this.closest('.dropdown-menu');
+            dropdownMenu.classList.remove('show');
+            updatePriceEstimate();
+        });
+    });
+
+    // Prevent guest dropdown from closing when clicking inside it
+    document.querySelectorAll('.guest-dropdown').forEach(dropdown => {
+        dropdown.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+
+    // Initialize counter button states
+    updateCounterButtonStates();
+});
+
+// Guest management
+let guests = {
+    adults: 1
+};
+
+function updateGuests(type, change) {
+    const newValue = guests[type] + change;
+    if (type === 'adults' && (newValue < 1 || newValue > 4)) return;
+    
+    guests[type] = newValue;
+    document.getElementById(`${type}Count`).textContent = newValue;
+    document.getElementById(`${type}Input`).value = newValue;
+    updateCounterButtonStates();
+    updateSummary();
+}
+
+function updateCounterButtonStates() {
+    document.querySelector('[onclick="updateGuests(\'adults\', -1)"]').disabled = guests.adults <= 1;
+    document.querySelector('[onclick="updateGuests(\'adults\', 1)"]').disabled = guests.adults >= 4;
+}
+
+function updateSummary() {
+    document.getElementById('guestSummary').textContent = 
+        `${guests.adults} Guest${guests.adults > 1 ? 's' : ''}`;
+    updatePriceEstimate();
+}
+
+function updatePriceEstimate() {
+    const cityInput = document.getElementById('cityInput');
+    const cityOption = document.querySelector(`.city-option[data-value="${cityInput.value}"]`);
+    const checkInDate = document.querySelector('input[name="check_in"]').value;
+    const checkOutDate = document.querySelector('input[name="check_out"]').value;
+    const priceEstimate = document.getElementById('priceEstimate');
+    
+    // Hide price estimate for "all" cities
+    if (cityInput.value === 'all') {
+        priceEstimate.style.display = 'none';
+        return;
+    }
+    
+    if (cityInput.value && checkInDate && checkOutDate && cityOption) {
+        const basePrice = parseFloat(cityOption.dataset.standardPrice);
+        const checkIn = new Date(checkInDate);
+        const checkOut = new Date(checkOutDate);
+        
+        if (!isNaN(checkIn) && !isNaN(checkOut)) {
+            const nights = Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+            const isPeakSeason = isPeak(checkIn);
+            const totalGuests = guests.adults;
+            
+            let estimatedPrice = calculateEstimatedPrice(basePrice, nights, isPeakSeason, totalGuests, 1);
+            
+            priceEstimate.style.display = 'block';
+            document.getElementById('priceRange').textContent = 
+                `${formatCurrency(estimatedPrice.min)} - ${formatCurrency(estimatedPrice.max)} for ${nights} night${nights > 1 ? 's' : ''}`;
+        }
+    }
+}
+
+function isPeak(date) {
+    const month = date.getMonth() + 1;
+    return [4, 5, 6, 7, 8, 11, 12].includes(month);
+}
+
+function calculateEstimatedPrice(basePrice, nights, isPeak, guests, rooms) {
+    const rate = isPeak ? basePrice * 1.2 : basePrice;
+    let minPrice = rate;
+    let maxPrice = rate * 1.5;
+    
+    if (guests > 1) {
+        minPrice = rate * 1.2;
+    }
+    if (guests > 2) {
+        minPrice = rate * 1.5;
+    }
+    
+    minPrice *= nights;
+    maxPrice *= nights;
+    
+    const daysInAdvance = Math.floor((new Date(document.querySelector('input[name="check_in"]').value) - new Date()) / (1000 * 60 * 60 * 24));
+    let discount = 0;
+    
+    if (daysInAdvance >= 80) discount = 0.3;
+    else if (daysInAdvance >= 60) discount = 0.2;
+    else if (daysInAdvance >= 45) discount = 0.1;
+    
+    return {
+        min: minPrice * (1 - discount),
+        max: maxPrice * (1 - discount)
+    };
+}
+
+function formatCurrency(amount) {
+    const currency = document.getElementById('currencyInput').value;
+    return new Intl.NumberFormat('en-GB', {
+        style: 'currency',
+        currency: currency
+    }).format(amount);
+}
+
+// Form validation
+document.getElementById('searchForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const city = document.getElementById('cityInput').value;
+    const checkIn = document.querySelector('input[name="check_in"]').value;
+    const checkOut = document.querySelector('input[name="check_out"]').value;
+    const validationModal = new bootstrap.Modal(document.getElementById('validationModal'));
+    
+    if (!city) {
+        document.getElementById('validationMessage').textContent = 'Please select a destination';
+        validationModal.show();
+        return;
+    }
+
+    if (!checkIn || !checkOut) {
+        document.getElementById('validationMessage').textContent = 'Please select both check-in and check-out dates';
+        validationModal.show();
+        return;
+    }
+
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
+
+    if (checkOutDate <= checkInDate) {
+        document.getElementById('validationMessage').textContent = 'Check-out date must be after check-in date';
+        validationModal.show();
+        return;
+    }
+
+    const nights = Math.round((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
+    if (nights > 30) {
+        document.getElementById('validationMessage').textContent = 'Maximum stay is 30 nights';
+        validationModal.show();
+        return;
+    }
+
+    this.submit();
+});
+</script>
+{% endblock %}

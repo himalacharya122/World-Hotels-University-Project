@@ -1,0 +1,1182 @@
+<!-- templates/home/index.html -->
+{% extends 'common/base.html' %}
+
+{% block title %}World Hotels - Luxury Stays{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+<style>
+    /* Hero Section */
+    .hero {
+        height: calc(100vh - var(--header-height));
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.6) 100%);
+        pointer-events: none;
+    }
+
+    /* Navigation Icons */
+    .hero-navigation {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 3;
+        background: linear-gradient(to top,rgba(0, 0, 0, 0.7) 0%,rgba(0, 0, 0, 0.4) 50%,
+            transparent 100%
+        );
+        padding: 4rem 0 2rem;
+    }
+
+    .nav-icons-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+    }
+
+    .nav-icons-container::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
+
+    .nav-icons {
+        display: flex;
+        justify-content: center;
+        gap: 4rem;
+        margin: 0;
+        padding: 0 2rem;
+        list-style: none;
+        white-space: nowrap;
+    }
+
+    .nav-icons li {
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .nav-icons img {
+        width: 32px;
+        height: 32px;
+        filter: brightness(0) invert(1);
+    }
+
+    .nav-icons a {
+        color: white;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .nav-icons span {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding-bottom: 4px;
+        border-bottom: 1.5px solid transparent;
+        transition: border-color 0.3s ease;
+    }
+
+    .nav-icons a:hover span {
+        border-bottom: 1px solid white;
+    }
+    
+
+    /* Mobile Styles */
+    @media (max-width: 991px) {
+        .hero {
+            max-height: 60vh;
+            
+        }
+        .hero-navigation {
+            padding: 1.5rem 0;
+        }
+
+        .nav-icons {
+            justify-content: flex-start;
+            gap: 3rem;
+        }
+
+        .nav-icons img {
+            width: 28px;
+            height: 28px;
+        }
+
+        .nav-icons span {
+            font-size: 0.8rem;
+        }
+    }
+
+
+
+    .intro-section {
+        padding: 2rem 0;
+        background-color: #fff;
+        max-width: 800px;
+    }
+
+    .intro-content {
+        position: relative;
+        text-align: left !important;
+        padding-bottom: 2rem;
+    }
+
+    .intro-subtitle {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: var(--accent-color);
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .intro-title {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin-bottom: 2rem;
+        color: var(--primary-color);
+        font-family: var(--font-display);
+    }
+
+    .intro-separator {
+        width: 50px;
+        height: 1px;
+        background-color: var(--accent-color);
+        margin: 2rem 0;
+    }
+
+    .intro-text {
+        font-size: 1.1rem;
+        font-family: var(--font-body);
+        line-height: 1.6;
+        color: #666;
+        max-width: 800px;
+    }
+
+    @media (max-width: 768px) {
+        .intro-section {
+            padding: 1rem 0 !important;
+        }
+
+        .intro-title {
+            font-size: 2rem !important;
+        }
+
+        .intro-text {
+            font-size: 1rem !important;
+        }
+    }
+
+
+
+    
+    .featured-section {
+        padding: 4rem 0 !important;
+        background-color: #f8f9fa;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .featured-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(0,0,0,0.1), transparent);
+    }
+
+    .featured-title {
+        font-size: 2.5rem !important;
+        margin-left: 0 !important;
+        font-weight: 300;
+        margin-bottom: 2rem !important;
+        color: var(--primary-color);
+        font-family: var(--font-display);
+    }
+
+    .destination-slider {
+        position: relative;
+        margin: 0 -20vw;
+    }
+
+    .slider-container {
+        display: flex;
+        transition: transform 0.5s ease;
+    }
+
+    .destination-slide {
+        min-width: 100%;
+        padding: 0 20vw;
+        opacity: 0.3;
+        transition: opacity 0.5s ease;
+    }
+
+    .destination-slide.active {
+        opacity: 1;
+    }
+
+    .destination-image {
+        width: 100%;
+        height: 60vh;
+        overflow: hidden;
+    }
+
+    .destination-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .destination-content {
+        margin-top: 2rem;
+        max-width: 700px !important;
+    }
+
+    .destination-city {
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+        color: var(--accent-color);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .destination-content p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+
+
+    .explore-link {
+        display: inline-block;
+        text-decoration: none;
+        border-bottom: 1px solid #1a1a1a;
+        padding-bottom: 2px;
+        font-size: 0.8rem;
+        color: var(--primary-color);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        transition: opacity 0.3s ease;
+    }
+
+    .explore-link:hover {
+        color: var(--accent-color);
+    }
+
+    .slider-navigation {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .nav-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        color: #1a1a1a;
+        transition: opacity 0.3s ease;
+    }
+
+    .nav-btn:hover {
+        opacity: 0.7;
+    }
+
+    .slide-counter {
+        font-size: 1rem;
+        color: #1a1a1a;
+    }
+
+    @media (max-width: 575px) {
+        .featured-section {
+            padding: 2rem 0 !important;
+        }
+
+        .destination-slider {
+            margin: 0;
+        }
+
+        .destination-slide {
+            min-width: 100%;
+            padding: 0 1rem;
+        }
+
+        .featured-title {
+            padding: 0 1rem !important;
+            font-size: 2rem !important;
+        }
+
+        .destination-image {
+            height: 30vh;
+        }
+
+        .destination-city {
+            font-size: 1.1rem !important;
+        }
+
+        .destination-content p {
+            font-size: 1rem;
+        }
+
+        .slider-navigation {
+            gap: 0.5rem !important;
+        }
+    }
+
+    /* Mobile Styles */
+    @media (min-width: 576px) and (max-width: 768px) {
+        .featured-section {
+            padding: 3rem 0 !important;
+        }
+
+        .featured-title {
+            padding: 0 1rem !important;
+            font-size: 2rem !important;
+        }
+
+        .destination-slide {
+            min-width: 100%;
+            padding: 0 1rem !important;
+        }
+
+        .destination-slider {
+            margin: 0;
+        }
+
+        .destination-slide {
+            padding: 0 1.5rem;
+        }
+
+        .destination-image {
+            height: 40vh;
+        }
+
+        .destination-content {
+            margin-top: 1.5rem;
+        }
+
+        .destination-city {
+            font-size: 1.3rem !important;
+        }
+
+        .destination-content p {
+            font-size: 1rem;
+        }
+
+        .slider-navigation {
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+    }
+
+
+    @media (min-width: 769px) {
+        .featured-section {
+            padding: 4rem 0 !important;
+            overflow: hidden;
+        }
+
+        .featured-title {
+            font-size: 2.5rem !important;
+            margin-bottom: 4rem;
+            margin-left: 20vw;
+        }
+
+        .destination-slider {
+            position: relative;
+            width: 100vw;
+            margin-left: calc(-20vw - 15px);
+            padding: 0 20vw;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+        }
+
+        .destination-slide {
+            min-width: 50vw;
+            opacity: 0.3;
+            transition: all 0.5s ease;
+            flex-shrink: 0;
+            padding: 0 15px;
+        }
+
+        .destination-slide.active {
+            opacity: 1;
+        }
+
+        .destination-image {
+            width: 100%;
+            height: 55vh;
+        }
+
+        .destination-content {
+            margin-top: 2rem;
+            max-width: 500px;
+            padding: 0;
+        }
+
+        .destination-city {
+            font-size: 1.5rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+
+        .destination-content p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .slider-navigation {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 3rem;
+            margin-left: 0;
+        }
+
+        .nav-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .slide-counter {
+            font-size: 1rem;
+            color: #1a1a1a;
+        }
+    }
+
+
+
+    .gallery-section {
+        padding: 4rem 0;
+        background-color: #fff;
+    }
+
+    .gallery-section h2 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        color: var(--primary-color);
+        font-family: var(--font-display);
+        margin-bottom: 1rem;
+    }
+
+    .gallery-subtitle {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #666;
+        max-width: 1320px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-top: 2rem;
+        position: relative;
+    }
+
+    .gallery-item {
+        position: relative;
+        height: 180px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        background-color: #f8f8f8;
+        transition: transform 0.3s ease;
+    }
+
+    /* Different sizes for gallery items */
+    .gallery-item.small {
+        height: 180px;
+        position: absolute;
+        width: calc(25% - 12px);
+        right: 0;
+    }
+
+    .gallery-item.small.top-right {
+        top: 0;
+    }
+
+    .gallery-item.small.bottom-right {
+        bottom: 0;
+    }
+
+    .gallery-item.wide {
+        grid-column: span 2;
+        height: 200px;
+    }
+
+    .gallery-item.tall {
+        grid-row: span 2;
+        height: 375px;
+    }
+
+    .gallery-item.big {
+        grid-column: span 2;
+        grid-row: span 2;
+        height: 375px;
+    }
+
+
+    /* Responsive */
+    @media (max-width: 991px) {
+        .gallery-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .gallery-item.small {
+            width: calc(33.333% - 8px);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .gallery-grid {
+
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .gallery-item {
+            width: calc(50% - 5px);
+            height: 160px;
+            position: relative !important;
+            right: auto !important;
+            top: auto !important;
+            bottom: auto !important;
+        }
+        
+        .gallery-item.small {
+            width: calc(50% - 5px);
+        }
+        
+
+        .gallery-item:nth-child(6) {
+            width: calc(50% - 5px);
+        }
+        
+        .gallery-item:nth-child(10) {
+            width: calc(50% - 5px);
+            order: 8;
+        }
+        
+        .gallery-item.wide,
+        .gallery-item.tall,
+        .gallery-item.big {
+            width: 100%;
+            height: 200px;
+        }
+        
+        .gallery-item:nth-child(7),
+        .gallery-item:nth-child(8),
+        .gallery-item:nth-child(9) {
+            width: 100%;
+        }
+
+        .gallery-section h2 {
+            padding: 0 1rem;
+            font-size: 2.5rem;
+        }
+
+        .gallery-subtitle {
+            padding: 0 1rem;
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .gallery-grid {
+            gap: 8px;
+        }
+        
+        .gallery-item,
+        .gallery-item.small,
+        .gallery-item.wide,
+        .gallery-item.tall,
+        .gallery-item.big,
+        .gallery-item:nth-child(6),
+        .gallery-item:nth-child(7),
+        .gallery-item:nth-child(8),
+        .gallery-item:nth-child(9),
+        .gallery-item:nth-child(10) {
+            width: 100% !important;
+            height: 200px !important;
+            margin-bottom: 8px;
+            position: relative !important;
+        }
+    }
+
+    .gallery-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        opacity: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s ease;
+        padding: 20px;
+    }
+
+    .gallery-item:hover .gallery-overlay {
+        opacity: 1;
+    }
+
+    .overlay-content {
+        text-align: center;
+        max-width: 90%;
+    }
+
+    .overlay-content p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+        margin: 0;
+        font-weight: 300;
+    }
+
+
+    
+    .newsletter-section {
+        padding: 6rem 0;
+        background-color: #f8f9fa;
+        position: relative;
+    }
+
+    .newsletter-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(0,0,0,0.1), transparent);
+    }
+
+    .newsletter-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .newsletter-section h2 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        color: var(--primary-color);
+        font-family: var(--font-display);
+        margin-bottom: 1rem;
+    }
+
+    .newsletter-subtitle {
+        font-size: 1.1rem;
+        font-family: var(--font-body);
+        line-height: 1.6;
+        color: #666;
+        max-width: 700px;
+        margin: 2rem auto;
+    }
+
+    .newsletter-form {
+        margin-top: 3rem;
+    }
+
+    .newsletter-form .input-group {
+        display: flex;
+        max-width: 500px;
+        margin: 0 auto;
+        border: 1px solid #ddd;
+        border-radius: 0 !important;
+        overflow: hidden;
+        background: #fff;
+        transition: border-color 0.3s ease;
+    }
+
+    .newsletter-form .input-group:focus-within {
+        border-color: var(--accent-color);
+    }
+
+    .newsletter-form .form-control {
+        border: none;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        flex: 1;
+        background: transparent;
+        width: 100%;
+    }
+
+    .newsletter-form .form-control:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .newsletter-form .btn {
+        padding: 1rem 2rem;
+        background-color: var(--primary-color);
+        border: none;
+        color: white;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: background-color 0.3s ease;
+        min-width: 140px;
+        white-space: nowrap;
+        border-radius: 0 !important;
+    }
+
+    .newsletter-form .btn:hover {
+        background-color: var(--accent-color);
+    }
+
+    .newsletter-message {
+        font-size: 0.9rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        font-weight: 300;
+    }
+
+    .newsletter-message.text-success {
+        color: #28a745;
+        background-color: rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .newsletter-message.text-danger {
+        color: #dc3545;
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        .newsletter-section {
+            padding: 4rem 1rem;
+        }
+
+        .newsletter-wrapper {
+            padding: 0 15px;
+        }
+        
+        .newsletter-form .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: none;
+            background: transparent;
+        }
+        
+        .newsletter-form .form-control {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            height: 50px;
+        }
+        
+        .newsletter-form .btn {
+            width: 100%;
+            border-radius: 4px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .newsletter-section h2 {
+            font-size: 2.5rem;
+        }
+
+        .newsletter-subtitle {
+            font-size: 1rem;
+            margin: 1.5rem auto;
+            padding: 0 10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .newsletter-section {
+            padding: 3rem 1rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+    }
+
+    
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <video class="hero-video" autoplay muted loop playsinline>
+        <source src="{{ url_for('static', filename='videos/hero.mp4') }}" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-navigation">
+        <div class="nav-icons-container">
+            <ul class="nav-icons">
+                <li>
+                    <a href="{{ url_for('destinations') }}">
+                        <img src="{{ url_for('static', filename='images/icons/hotel.png') }}" alt="Hotels">
+                        <span>Hotels</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('destinations') }}">
+                        <img src="{{ url_for('static', filename='images/icons/home.png') }}" alt="Exceptional Homes">
+                        <span>Homes</span>
+                    </a>
+                </li>
+            <li>
+                <a href="{{ url_for('destinations') }}">
+                    <img src="{{ url_for('static', filename='images/icons/residence.png') }}" alt="Residences">
+                    <span>Residences</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('search') }}">
+                    <img src="{{ url_for('static', filename='images/icons/dine.png') }}" alt="Dine">
+                    <span>Dine</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('search') }}">
+                    <img src="{{ url_for('static', filename='images/icons/celebrate.png') }}" alt="Celebrate">
+                    <span>Celebrate</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('search') }}">
+                    <img src="{{ url_for('static', filename='images/icons/shop.png') }}" alt="Shop">
+                    <span>Shop</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</section>
+
+
+<section class="intro-section"></section>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-12 text-center">
+                <div class="intro-content">
+                    <span class="intro-subtitle">Welcome to World Hotels</span>
+                    <h2 class="intro-title">A Legacy of Luxury Since 1988</h2>
+                    <div class="intro-separator"></div>
+                    <p class="intro-text">Welcome to our luxury hotels and resorts, where you can enjoy great service, comfort, and beautiful locations for an unforgettable stay.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="featured-section">
+    <div class="container">
+        <h1 class="featured-title">Featured Destinations</h1>
+        
+        <div class="destination-slider">
+            <div class="slider-container">
+                {% for dest in destinations %}
+                <div class="destination-slide {% if loop.index == 2 %}active{% endif %}">
+                    <div class="destination-image">
+                        {% if dest.hotel_image %}
+                            <img src="{{ dest.hotel_image }}" 
+                                 alt="{{ dest.city }}"
+                                 loading="lazy"
+                                 decoding="async"
+                                 onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/placeholder-hotel.jpg') }}';">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/placeholder-hotel.jpg') }}" 
+                                 alt="{{ dest.city }}"
+                                 loading="lazy">
+                        {% endif %}
+                    </div>
+                    <div class="destination-content">
+                        <div class="destination-city">{{ dest.city }}, United Kingdom</div>
+                        <p>{{ dest.description }}</p>
+                        <a href="{{ url_for('hotel_details', hotel_id=dest.hotel_id) }}" class="explore-link">
+                            Explore
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="slider-navigation">
+                <button class="nav-btn prev-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M15 18l-6-6 6-6" stroke="currentColor" fill="none" stroke-width="2"/>
+                    </svg>
+                </button>
+                <div class="slide-counter">
+                    <span class="current">1</span> / <span class="total">6</span>
+                </div>
+                <button class="nav-btn next-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M9 18l6-6-6-6" stroke="currentColor" fill="none" stroke-width="2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="gallery-section">
+    <div class="container">
+        <h2 class="section-title text-center">Inspirations</h2>
+        <p class="gallery-subtitle text-center">Explore our selection of luxury experiences</p>
+        <div class="gallery-grid">
+            {% for image in gallery_images %}
+                {% if loop.index == 1 %}
+                    <div class="gallery-item small top-right">
+                        <img src="{{ image.image_url }}" alt="{{ image.title }}" loading="lazy" 
+                        onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/default-room.jpg') }}';">
+                        <div class="gallery-overlay">
+                            <div class="overlay-content">
+                                <p>{{ image.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% elif loop.index == 2 %}
+                    <div class="gallery-item small bottom-right">
+                        <img src="{{ image.image_url }}" alt="{{ image.title }}" loading="lazy" 
+                        onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/default-room.jpg') }}';">
+                        <div class="gallery-overlay">
+                            <div class="overlay-content">
+                                <p>{{ image.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="gallery-item {{ ['wide', 'tall', 'big', ''][(loop.index-3) % 4] }}">
+                        <img src="{{ image.image_url }}" alt="{{ image.title }}" loading="lazy" 
+                        onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/default-room.jpg') }}';">
+                        <div class="gallery-overlay">
+                            <div class="overlay-content">
+                                <p>{{ image.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="newsletter-section">
+    <div class="container">
+        <div class="newsletter-wrapper text-center">
+            <span class="intro-subtitle">Stay Connected</span>
+            <h2 class="section-title">Subscribe to Our Newsletter</h2>
+            <p class="newsletter-subtitle">Join our community and be the first to receive exclusive offers, luxury insights, and privileged access to World Hotels experiences.</p>
+            <form id="newsletterForm" class="newsletter-form" method="POST" action="{{ url_for('subscribe_newsletter') }}">
+                {{ form.csrf_token }}
+                <div class="input-group">
+                    <input type="email" name="email" class="form-control" placeholder="Your email address" required autocomplete="off">
+                    <button type="submit" class="btn">Subscribe</button>
+                </div>
+                <div class="newsletter-message mt-3" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}
+
+{% block extra_js %}
+{{ super() }}
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.querySelector('.nav-icons-container');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        container.addEventListener('mousedown', (e) => {
+            isDown = true;
+            container.style.cursor = 'grabbing';
+            startX = e.pageX - container.offsetLeft;
+            scrollLeft = container.scrollLeft;
+        });
+
+        container.addEventListener('mouseleave', () => {
+            isDown = false;
+            container.style.cursor = 'grab';
+        });
+
+        container.addEventListener('mouseup', () => {
+            isDown = false;
+            container.style.cursor = 'grab';
+        });
+
+        container.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - container.offsetLeft;
+            const walk = (x - startX) * 2;
+            container.scrollLeft = scrollLeft - walk;
+        });
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const slider = document.querySelector('.slider-container');
+        const slides = document.querySelectorAll('.destination-slide');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        const currentSlide = document.querySelector('.current');
+        const totalSlides = document.querySelector('.total');
+        
+        let current = 1;
+        totalSlides.textContent = slides.length;
+        
+        function updateSlider() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index + 1 === current) {
+                    slide.classList.add('active');
+                }
+            });
+            
+            if (window.innerWidth >= 769) {
+                // For desktop - calculate exact pixel offset including gap
+                const slideWidth = slider.querySelector('.destination-slide').offsetWidth;
+                const gap = 30; // Match the gap from CSS
+                const offset = (current - 1) * (slideWidth + gap);
+                slider.style.transform = `translateX(-${offset}px)`;
+            } else {
+                // For all mobile screens - calculate exact pixel offset
+                const slideWidth = slider.querySelector('.destination-slide').offsetWidth;
+                const offset = (current - 1) * slideWidth;
+                slider.style.transform = `translateX(-${offset}px)`;
+            }
+            
+            currentSlide.textContent = current;
+        }
+
+        // Add resize handler to recalculate on screen size changes
+        window.addEventListener('resize', updateSlider);
+        
+        prevBtn.addEventListener('click', () => {
+            current = current === 1 ? slides.length : current - 1;
+            updateSlider();
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            current = current === slides.length ? 1 : current + 1;
+            updateSlider();
+        });
+        
+        // Touch support
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        slider.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        slider.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) {
+                nextBtn.click();
+            } else if (touchEndX - touchStartX > 50) {
+                prevBtn.click();
+            }
+        });
+
+        // Update on resize
+        window.addEventListener('resize', updateSlider);
+        
+        // Initial update
+        updateSlider();
+    });
+
+
+
+    // newsletter
+    document.addEventListener('DOMContentLoaded', function() {
+        const newsletterForm = document.getElementById('newsletterForm');
+        const messageDiv = newsletterForm.querySelector('.newsletter-message');
+
+        newsletterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'newsletter-message mt-3 ' + (data.success ? 'text-success' : 'text-danger');
+                messageDiv.textContent = data.message;
+                
+                if (data.success) {
+                    newsletterForm.reset();
+                }
+            })
+            .catch(error => {
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'newsletter-message mt-3 text-danger';
+                messageDiv.textContent = 'An error occurred. Please try again.';
+            });
+        });
+    });
+</script>
+{% endblock %}

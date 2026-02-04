@@ -1,0 +1,43 @@
+{% extends 'email/base_email.html' %}
+
+{% block content %}
+<h2>Booking Confirmation</h2>
+
+<p>Dear {{ primary_guest.guest_name }},</p>
+
+<p>Thank you for choosing World Hotels. Your booking has been confirmed!</p>
+
+<div class="booking-details">
+    <h3>Booking Reference: {{ booking.booking_reference }}</h3>
+    
+    <div class="stay-details">
+        <h4>Stay Details</h4>
+        <p>
+            <strong>Hotel:</strong> {{ booking.hotel_name }}<br>
+            <strong>Room Type:</strong> {{ booking.type_name }}<br>
+            <strong>Check-in:</strong> {{ booking.check_in_date|date }}<br>
+            <strong>Check-out:</strong> {{ booking.check_out_date|date }}
+        </p>
+    </div>
+
+    <div class="price-details">
+        <h4>Price Details</h4>
+        <p>Total Amount: {{ booking.final_amount|currency }}</p>
+    </div>
+
+    <div class="cancellation-policy">
+        <h4>Cancellation Policy</h4>
+        <ul>
+            <li>Free cancellation until {{ cancellation_dates.free|date }}</li>
+            <li>50% charge between {{ cancellation_dates.partial|date }} and {{ cancellation_dates.free|date }}</li>
+            <li>100% charge after {{ cancellation_dates.partial|date }}</li>
+        </ul>
+    </div>
+</div>
+
+<p>Please find your booking confirmation PDF attached to this email.</p>
+
+<p>We look forward to welcoming you!</p>
+
+<p>Best regards,<br>World Hotels Team</p>
+{% endblock %}

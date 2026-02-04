@@ -1,0 +1,34 @@
+{% extends 'common/base.html' %}
+
+{% block title %}Verify Booking - World Hotels{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">Booking Verification</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Booking Details</h5>
+                    <p><strong>Reference:</strong> {{ booking.booking_reference }}</p>
+                    <p><strong>Status:</strong> 
+                        <span class="badge bg-{{ 'success' if booking.status == 'confirmed' else 'warning' }}">
+                            {{ booking.status|title }}
+                        </span>
+                    </p>
+                    <p><strong>Guest:</strong> {{ booking.primary_guest_name }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Stay Details</h5>
+                    <p><strong>Hotel:</strong> {{ booking.hotel_name }}</p>
+                    <p><strong>Room Type:</strong> {{ booking.type_name }}</p>
+                    <p><strong>Check-in:</strong> {{ booking.check_in_date|date }}</p>
+                    <p><strong>Check-out:</strong> {{ booking.check_out_date|date }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

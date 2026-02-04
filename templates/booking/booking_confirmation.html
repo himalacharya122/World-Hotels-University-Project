@@ -1,0 +1,352 @@
+<!-- templates/booking/booking_confirmation.html -->
+{% extends 'common/base.html' %}
+
+{% block title %}Booking Confirmed - World Hotels{% endblock %}
+
+{% block extra_css %}
+<style>
+.confirmation-container-wrapper {
+    width: 100%;
+    background-color: #f8f9fa;
+}
+
+.confirmation-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 3rem 1rem;
+}
+
+/* Success Header */
+.success-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 3rem 0;
+    background: linear-gradient(rgba(154, 138, 120, 0.1), rgba(154, 138, 120, 0.05));
+    border-bottom: 3px solid var(--accent-color);
+}
+
+.success-icon {
+    color: #28a745;
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: scaleIn 0.5s ease-out;
+}
+
+.success-header h1 {
+    font-family: var(--font-display);
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+}
+
+.success-header .lead {
+    color: #666;
+    font-size: 1.2rem;
+}
+
+.success-header .lead strong {
+    color: var(--accent-color);
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+}
+
+/* Booking Details */
+.booking-details {
+    background: white;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid #9A8A78;
+}
+
+.detail-section {
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid #eee;
+    position: relative;
+}
+
+.detail-section:last-child {
+    margin-bottom: 0;
+}
+
+.detail-section h4 {
+    font-family: var(--font-display);
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent-color);
+    display: inline-block;
+}
+
+.detail-section h5 {
+    font-family: var(--font-display);
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+}
+
+/* Price Breakdown */
+.price-breakdown {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-left: 3px solid var(--accent-color);
+}
+
+.price-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    color: #666;
+}
+
+.total-price {
+    border-top: 2px solid var(--accent-color);
+    padding-top: 1rem;
+    margin-top: 1rem;
+    color: var(--text-dark);
+    font-size: 1.1rem;
+}
+
+/* Cancellation Policy */
+.cancellation-policy {
+    background: rgba(154, 138, 120, 0.1);
+    padding: 1.5rem;
+    border-left: 3px solid var(--accent-color);
+}
+
+/* QR Code */
+.qr-code {
+    text-align: center;
+    margin: 2rem 0;
+    padding: 2rem;
+    background: #f8f9fa;
+}
+
+.qr-code img {
+    max-width: 200px;
+    margin-bottom: 1rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+    transition: var(--transition);
+}
+
+.btn i {
+    margin-right: 0.5rem;
+}
+
+.btn-dark {
+    background: var(--primary-color);
+    border: none;
+}
+
+.btn-dark:hover {
+    background: var(--accent-color);
+}
+
+.btn-outline-dark {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline-dark:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Print Styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .confirmation-container {
+        padding: 0;
+    }
+    
+    .detail-section {
+        break-inside: avoid;
+    }
+}
+
+/* Animations */
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .confirmation-container {
+        padding: 2rem 1rem;
+    }
+    
+    .success-header {
+        padding: 2rem 1rem;
+    }
+    
+    .detail-section {
+        padding: 1.5rem;
+    }
+    
+    .action-buttons .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .success-icon {
+        font-size: 3rem;
+    }
+    
+    .success-header h1 {
+        font-size: 1.75rem;
+    }
+}
+
+/* Icons */
+.detail-section i {
+    color: var(--accent-color);
+    width: 20px;
+    text-align: center;
+    margin-right: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="confirmation-container-wrapper">
+    <div class="confirmation-container">
+        <!-- Success Header -->
+        <div class="success-header">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1>Booking Confirmed!</h1>
+            <p class="lead">Your booking reference is: <strong>{{ booking.booking_reference }}</strong></p>
+        </div>
+
+        <!-- Booking Details -->
+        <div class="booking-details">
+            <!-- Hotel and Room Details -->
+            <div class="detail-section">
+                <h4>Stay Details</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>{{ booking.hotel_name }}</h5>
+                        <p>{{ booking.address }}</p>
+                        <p>
+                            <strong>Room Type:</strong> {{ booking.type_name }}<br>
+                            <strong>Check-in:</strong> {{ booking.check_in_date|date }} after {{ booking.check_in_time|time }}<br>
+                            <strong>Check-out:</strong> {{ booking.check_out_date|date }} before {{ booking.check_out_time|time }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Contact Information</h5>
+                        <p>
+                            <i class="fas fa-phone"></i> {{ booking.contact_number }}<br>
+                            <i class="fas fa-envelope"></i> {{ booking.email }}
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guest Details -->
+            <div class="detail-section">
+                <h4>Guest Information</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Primary Guest</h5>
+                        <p>
+                            {{ primary_guest.guest_name }}<br>
+                            {{ primary_guest.guest_email }}<br>
+                            {{ primary_guest.guest_phone }}
+                        </p>
+                    </div>
+                    {% if additional_guests %}
+                    <div class="col-md-6">
+                        <h5>Additional Guests</h5>
+                        {% for guest in additional_guests %}
+                        <p>{{ guest.guest_name }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Price Details section -->
+            <div class="detail-section">
+                <h4>Price Details</h4>
+                <div class="price-breakdown">
+                    <div class="price-line">
+                        <span>Room Rate (per night)</span>
+                        <span>{{ (booking.total_amount / booking.total_nights)|currency }}</span>
+                    </div>
+                    <div class="price-line">
+                        <span>Subtotal ({{ booking.total_nights }} nights)</span>
+                        <span>{{ booking.total_amount|currency }}</span>
+                    </div>
+                    {% if booking.discount_amount > 0 %}
+                    <div class="price-line text-success">
+                        <span>Advance Booking Discount</span>
+                        <span>- {{ booking.discount_amount|currency }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="price-line total-price">
+                        <strong>Total Paid</strong>
+                        <strong>{{ booking.final_amount|currency }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cancellation Policy -->
+            <div class="detail-section">
+                <h4>Cancellation Policy</h4>
+                <div class="cancellation-policy">
+                    <p class="mb-0">
+                        • Free cancellation until {{ cancellation_dates.free|date }}<br>
+                        • 50% charge between {{ cancellation_dates.partial|date }} and {{ cancellation_dates.free|date }}<br>
+                        • 100% charge after {{ cancellation_dates.partial|date }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- QR Code -->
+            <div class="qr-code">
+                <img src="{{ qr_code_url }}" alt="Booking QR Code">
+                <p class="text-muted">Show this QR code at check-in</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons no-print">
+            <button class="btn btn-dark me-2" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Receipt
+            </button>
+            <a href="{{ url_for('download_pdf', booking_reference=booking.booking_reference) }}" 
+            class="btn btn-outline-dark me-2">
+                <i class="fas fa-download"></i> Download PDF
+            </a>
+            <a href="{{ url_for('my_bookings') }}" class="btn btn-outline-dark">
+                <i class="fas fa-list"></i> View All Bookings
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

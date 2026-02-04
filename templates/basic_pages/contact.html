@@ -1,0 +1,474 @@
+{% extends 'common/base.html' %}
+
+{% block title %}Contact Us - World Hotels{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contact-page {
+        background-color: #fff;
+    }
+
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                    url("{{ url_for('static', filename='images/destination-hero.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        color: white;
+        text-align: center;
+    }
+
+    .hero-content {
+        width: 100%;
+    }
+
+    .hero-content h1 {
+        font-size: 3rem;
+        font-weight: 300;
+        margin-bottom: 1rem;
+        font-family: var(--font-display);
+    }
+
+    .hero-content p {
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .contact-section {
+        padding: 5rem 0;
+    }
+
+    .contact-info {
+        padding-right: 3rem;
+    }
+
+    .contact-info h2 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin-bottom: 1.5rem;
+        font-family: var(--font-display);
+        color: var(--primary-color);
+    }
+
+    .contact-info > p {
+        color: #666;
+        margin-bottom: 3rem;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    .contact-details {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .contact-item i {
+        font-size: 1.5rem;
+        color: var(--accent-color);
+    }
+
+    .contact-item h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        color: var(--primary-color);
+    }
+
+    .contact-item p {
+        color: #666;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .contact-form-wrapper {
+        background: #f8f9fa;
+        padding: 2rem;
+        border: 1px solid var(--accent-color);
+        margin-bottom: 2rem;
+    }
+
+    .contact-form .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .contact-form label {
+        color: var(--primary-color);
+        margin-bottom: 0.6rem;
+    }
+
+    .contact-form .form-control {
+        border: 1px solid #ddd;
+        padding: 0.75rem;
+        border-radius: 0;
+    }
+
+    .contact-form .form-control:focus {
+        border-color: var(--accent-color);
+        box-shadow: none;
+    }
+
+    .contact-form .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+        border-radius: 0 !important;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        width: 100%;
+        transition: background-color 0.3s ease;
+    }
+
+    .contact-form .btn-primary:hover {
+        background-color: var(--accent-color);
+    }
+
+    @media (max-width: 991px) {
+        .contact-info {
+            padding-right: 0;
+            margin-bottom: 3rem;
+        }
+
+        .contact-form-wrapper {
+            padding: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            height: 250px;
+        }
+
+        .hero-content h1 {
+            font-size: 2.5rem;
+        }
+
+        .hero-content p {
+            font-size: 1rem;
+        }
+
+        .contact-section {
+            padding: 3rem 0;
+        }
+
+        .contact-info h2 {
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .contact-form-wrapper {
+            padding: 1.5rem;
+        }
+
+        .contact-info {
+            text-align: center;
+            padding-right: 0;
+            margin-bottom: 3rem;
+        }
+
+        .contact-info > p {
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 500px;
+        }
+
+        .contact-details {
+            align-items: center;
+        }
+
+        .contact-item {
+            flex-direction: column;  /* Stack icon and text vertically */
+            align-items: center;
+            text-align: center;
+            gap: 0.75rem;  /* Reduce gap between icon and text */
+        }
+
+        .contact-item i {
+            margin-bottom: 0.5rem;  /* Add space below icon */
+        }
+
+        .contact-item div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .contact-item h3 {
+            margin-bottom: 0.25rem;  /* Reduce space between heading and text */
+        }
+
+        .contact-item p {
+            margin: 0;
+        }
+
+    }
+
+
+    /* FAQ Section Styles */
+    .faq-section {
+        padding: 4rem 0;
+        background-color: #f8f9fa;
+    }
+
+    .faq-title {
+        margin-bottom: 3rem;
+        color: var(--primary-color);
+        font-family: var(--font-display);
+        font-size: 2.5rem;
+        font-weight: 300;
+    }
+
+    .accordion-item {
+        border: none;
+        margin-bottom: 1rem;
+        background: transparent;
+    }
+
+    .accordion-button {
+        background-color: white;
+        color: var(--primary-color);
+        font-weight: 500;
+        padding: 1.2rem;
+        border: 1px solid var(--accent-color);
+        border-radius: 0 !important;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background-color: white;
+        color: var(--accent-color);
+        box-shadow: none;
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: var(--accent-color);
+    }
+
+    .accordion-button::after {
+        background-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .accordion-body {
+        padding: 1.2rem;
+        background-color: white;
+        border: 1px solid var(--accent-color);
+        border-top: none;
+        color: #666;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        .contact-form-wrapper {
+            padding: 1.5rem;
+        }
+
+        .faq-section {
+            padding: 2rem 0;
+        }
+
+        .faq-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-page">
+    <div class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Contact Us</h1>
+                <p>We're here to help and answer any question you might have</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="contact-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="contact-info">
+                        <h2>Get in Touch</h2>
+                        <p>Have questions about your booking, our hotels, or anything else? We'd love to hear from you.</p>
+                        
+                        <div class="contact-details">
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div>
+                                    <h3>Address</h3>
+                                    <p>01 Jhamsikhel<br>Lalitpur, Nepal</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <div>
+                                    <h3>Phone</h3>
+                                    <p>+44 20 7123 4567</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <div>
+                                    <h3>Email</h3>
+                                    <p>info@worldhotels.com</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="contact-form-wrapper">
+                        <form method="POST" class="contact-form">
+                            {{ form.csrf_token }}
+                            
+                            <div class="form-group">
+                                {{ form.name.label }}
+                                {{ form.name(class="form-control") }}
+                                {% if form.name.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.email.label }}
+                                {{ form.email(class="form-control") }}
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.email.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.subject.label }}
+                                {{ form.subject(class="form-control") }}
+                                {% if form.subject.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.subject.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.message.label }}
+                                {{ form.message(class="form-control", rows=5) }}
+                                {% if form.message.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.message.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- FAQ Section -->
+    <div class="faq-section">
+        <div class="container">
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+            
+            <div class="accordion" id="faqAccordion">
+                <!-- FAQ Item 1 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            How do I make a reservation?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            You can make a reservation through our website by using the booking form, or by contacting our reservation team directly. We'll guide you through the process and ensure you get the best available rates.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            What is your cancellation policy?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Our cancellation policy varies depending on the rate type and length of stay. Most reservations can be cancelled up to 24 hours before check-in. Please check your booking confirmation for specific details.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            What are your check-in and check-out times?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Standard check-in time is from 3:00 PM, and check-out is until 11:00 AM. Early check-in and late check-out may be available upon request, subject to availability.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            Do you offer airport transfers?
+                        </button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yes, we offer airport transfer services. Please contact us at least 24 hours before your arrival to arrange transportation. Additional charges may apply.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 5 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                            Is breakfast included in the room rate?
+                        </button>
+                    </h2>
+                    <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Breakfast inclusion varies by room type and rate. Please check your booking details or contact us directly to confirm if breakfast is included in your stay.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

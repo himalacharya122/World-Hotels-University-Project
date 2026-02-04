@@ -1,0 +1,774 @@
+<!-- templates/booking/room_list.html -->
+{% extends 'common/base.html' %}
+
+{% block title %}{{ hotel.hotel_name }} - Rooms{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
+<style>
+    /* Room List Page Styles */
+    .hotel-header {
+        padding-top: 100px !important;
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                    url("{{ hotel.hotel_image }}");
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 6rem 0;
+        margin-bottom: 2rem;
+    }
+
+    .hotel-header h1 {
+        font-family: var(--font-display);
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .hotel-header .lead {
+        font-family: var(--font-primary);
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    /* Room Type Info */
+    .guest-info-section {
+        background: rgba(154, 138, 120, 0.1); /* Lighter version of #9A8A78 */
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid #9A8A78;
+        position: relative;
+    }
+
+    .guest-info-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, rgba(154, 138, 120, 0.05), transparent);
+        pointer-events: none;
+    }
+
+    .guest-info-section i {
+        color: #9A8A78;
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+    }
+
+    .guest-info-section ul {
+        list-style: none;
+        padding-left: 2rem;
+        margin-top: 1rem;
+        margin-bottom: 0;
+    }
+
+    .guest-info-section li {
+        margin-bottom: 0.75rem;
+        color: #666;
+        position: relative;
+    }
+
+    .guest-info-section li:last-child {
+        margin-bottom: 0;
+    }
+
+    .guest-info-section li::before {
+        content: '•';
+        color: #9A8A78;
+        position: absolute;
+        left: -1rem;
+        font-weight: bold;
+    }
+
+    /* Room Cards */
+    .room-card {
+        margin-bottom: 2rem;
+        border: 1px solid #dee2e6;
+        overflow: hidden;
+        border-radius: 0 !important;
+    }
+
+    .room-image {
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-title {
+        font-family: var(--font-display);
+        color: var(--text-dark);
+    }
+
+    /* Room Features */
+    .room-features {
+        margin: 1rem 0;
+    }
+
+    .feature-badge {
+        display: inline-block;
+        background: #f8f9fa;
+        padding: 0.4rem 0.8rem;
+        margin: 0.25rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: #495057;
+    }
+
+    .feature-badge i {
+        color: var(--accent-color);
+        margin-right: 0.5rem;
+    }
+
+    /* Price Breakdown */
+    .price-breakdown {
+        background: #f8f9fa;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+
+    .price-line {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        color: #666;
+    }
+
+    .total-price {
+        border-top: 1px solid #dee2e6;
+        padding-top: 0.5rem;
+        margin-top: 0.5rem;
+        color: var(--text-dark);
+    }
+
+
+    
+
+    /* Booking Summary */
+    .booking-summary {
+        background: white;
+        padding: 1.5rem;
+        border: 1px solid #dee2e6;
+        position: sticky;
+        top: 90px;
+    }
+
+    .booking-summary h5 {
+        font-family: var(--font-display);
+        margin-bottom: 1.5rem;
+    }
+
+    .date-input-container {
+        position: relative;
+    }
+
+    .date-input-container i {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9D8E7C;
+        font-size: 1.1rem;
+    }
+
+    .date-input-container input {
+        padding-right: 2.5rem;
+        padding-left: 1rem;
+    }
+
+    .date-range-info {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+
+    /* Form Controls and Dropdowns */
+    .form-control,
+    .btn,
+    .dropdown-menu,
+    .flatpickr-calendar {
+        border-radius: 0 !important;
+    }
+
+    /* Form Labels */
+    .form-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Dropdown Styling */
+    .dropdown-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        border-bottom: 1px solid #dadada;
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .currency-option {
+        color: #495057;
+        font-size: 0.95rem;
+    }
+
+
+
+    /* Guest Dropdown */
+    .dropdown-toggle {
+        background: white;
+        text-align: left;
+        position: relative;
+        padding-right: 2rem;
+    }
+
+    .dropdown-toggle::after {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .guest-dropdown {
+        width: 300px;
+        border-radius: 0;
+        border: none;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    .guest-counter {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+    }
+
+    .counter-btn {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #dee2e6;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .counter-btn:hover:not(:disabled) {
+        background: #9D8E7C;
+        color: white;
+        border-color: #9D8E7C;
+    }
+
+    .counter-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Currency Dropdown Styling */
+    .currency-option {
+        color: #495057;
+        font-size: 0.95rem;
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .currency-option:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Dropdown Menu Common Styles */
+    .dropdown-menu {
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 0.5rem 0;
+        border-radius: 0 !important;
+        border: var(--accent-color) 1px solid;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Custom scrollbar for dropdown lists */
+    .dropdown-menu::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .dropdown-menu::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .dropdown-menu::-webkit-scrollbar-thumb {
+        background: #9D8E7C;
+    }
+
+    .dropdown-menu::-webkit-scrollbar-thumb:hover {
+        background: #8a7d6d;
+    }
+
+
+    /* Guest Info Section in Dropdown */
+    .guest-info-section {  /* Changed from room-type-info */
+        border-top: 1px solid #dee2e6;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+
+    .guest-info-section small {  /* Changed from room-type-info */
+        font-size: 0.8rem;
+        line-height: 1.8;
+    }
+
+
+
+
+    /* Responsive Adjustments */
+    @media (max-width: 991px) {
+        .hotel-header {
+            padding: 4rem 0;
+        }
+
+        .hotel-header h1 {
+            font-size: 2rem;
+        }
+
+        .booking-summary {
+            position: static;
+            margin-bottom: 2rem;
+        }
+
+        .room-card .row {
+            flex-direction: column;
+        }
+
+        .room-image {
+            height: 250px;
+            width: 100%;
+        }
+
+        .col-md-5, .col-md-7 {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .guest-dropdown {
+            width: 100%;
+        }
+
+        .guest-info-section {
+            padding: 1.25rem;
+        }
+        
+        .guest-info-section ul {
+            padding-left: 1.5rem;
+        }
+        
+        .hotel-header {
+            padding: 3rem 0;
+        }
+
+        .hotel-header h1 {
+            font-size: 1.75rem;
+        }
+
+        .room-image {
+            height: 200px;
+        }
+
+        .feature-badge {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
+        }
+
+        .price-breakdown {
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Button Styles */
+    .btn-dark {
+        background: var(--primary-color);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+        transition: var(--transition);
+        border-radius: 0 !important;
+    }
+
+    .btn-dark:hover {
+        background: var(--accent-color);
+    }
+
+    /* Form Controls */
+    .form-control, .form-select {
+        border-radius: 0;
+        border-color: #dee2e6;
+        padding: 0.75rem 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent-color);
+        box-shadow: none;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hotel Header -->
+<div class="hotel-header">
+    <div class="container">
+        <h1>{{ hotel.hotel_name }}</h1>
+        <p class="lead mb-0">
+            <i class="fas fa-map-marker-alt"></i> {{ hotel.address }}
+        </p>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="row">
+        <!-- Room Listings -->
+        <div class="col-lg-8">
+            <!-- Room Type Info -->
+            <div class="guest-info-section mt-3">  <!-- Changed from room-type-info -->
+                <small class="text-muted">
+                    Standard: 1 guest<br>
+                    Double: 2 guests (10% extra)<br>
+                    Family: up to 4 guests
+                </small>
+            </div>
+
+            {% for room in available_rooms %}
+            <div class="card room-card">
+                <div class="row g-0">
+                    <div class="col-md-5">
+                        <img src="{{ room.room_image or url_for('static', filename='images/default-room.jpg') }}" 
+                             class="room-image img-fluid" 
+                             alt="{{ room.type_name }}">
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h5 class="card-title">{{ room.type_name }} Room</h5>
+                                <div class="text-end">
+                                    <h5 class="mb-1">{{ room.price|currency(selected_currency) }}</h5>
+                                    <small class="text-muted">per night</small>
+                                </div>
+                            </div>
+
+                            <p class="card-text">{{ room.description }}</p>
+
+                            <!-- Room Features -->
+                            <div class="room-features">
+                                {% for feature in room.features %}
+                                <span class="feature-badge">
+                                    <i class="{{ feature.icon_class }}"></i>
+                                    {{ feature.feature_name }}
+                                </span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Room Details -->
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    Max Occupancy: {{ room.max_occupancy }} guests
+                                    {% if room.available_rooms > 1 %}
+                                    • {{ room.available_rooms }} rooms available
+                                    {% else %}
+                                    • Last room available!
+                                    {% endif %}
+                                </small>
+                            </div>
+
+                            <!-- Price Breakdown -->
+                            <div class="price-breakdown">
+                                <div class="price-line">
+                                    <span>Base rate per night</span>
+                                    <span>{{ room.base_price|currency(selected_currency) }}</span>
+                                </div>
+                                {% if room.extra_guest_charge > 0 %}
+                                <div class="price-line">
+                                    <span>Extra guest charge</span>
+                                    <span>+ {{ room.extra_guest_charge|currency(selected_currency) }}</span>
+                                </div>
+                                {% endif %}
+                                {% if discount_percentage > 0 %}
+                                <div class="price-line text-success">
+                                    <span>Advance booking discount ({{ discount_percentage }}%)</span>
+                                    <span>- {{ room.discount_amount|currency(selected_currency) }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="price-line total-price">
+                                    <strong>Total for {{ total_nights }} night{% if total_nights != 1 %}s{% endif %}</strong>
+                                    <strong>{{ room.total_price|currency(selected_currency) }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <form action="{{ url_for('booking_form') }}" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="hotel_id" value="{{ hotel.hotel_id }}">
+                                    <input type="hidden" name="room_id" value="{{ room.room_id }}">
+                                    <input type="hidden" name="check_in" value="{{ check_in }}">
+                                    <input type="hidden" name="check_out" value="{{ check_out }}">
+                                    <input type="hidden" name="guests" value="{{ total_guests }}">
+                                    <input type="hidden" name="currency" value="{{ selected_currency }}">
+                                    <button type="submit" class="btn btn-dark">Book Now</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <h4>No rooms available for your dates</h4>
+                <p class="text-muted">Try different dates or check other hotels</p>
+                <button class="btn btn-outline-dark" onclick="history.back()">
+                    Back to Hotels
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Booking Summary Sidebar -->
+        <div class="col-lg-4">
+            <!-- Update the Booking Summary section -->
+            <div class="booking-summary">
+                <h5>Booking Summary</h5>
+                
+                <!-- Date Selection with Flatpickr -->
+                <div class="mb-3">
+                    <label class="form-label">Check In - Check Out</label>
+                    <div class="date-input-container">
+                        <i class="fas fa-calendar"></i>
+                        <input type="text" 
+                            class="form-control datepicker" 
+                            id="checkInDate" 
+                            value="{{ check_in|date }}"
+                            placeholder="Select date">
+                    </div>
+                    <div class="date-input-container mt-2">
+                        <i class="fas fa-calendar"></i>
+                        <input type="text" 
+                            class="form-control datepicker" 
+                            id="checkOutDate" 
+                            value="{{ check_out|date }}"
+                            placeholder="Select date">
+                    </div>
+                    <div class="date-range-info">Maximum stay: 30 days</div>
+                </div>
+
+                <!-- Guests -->
+                <div class="mb-3">
+                    <label class="form-label">Guests</label>
+                    <div class="dropdown">
+                        <button class="form-control text-start dropdown-toggle" 
+                                type="button" 
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <span id="guestSummary">{{ total_guests }} Guest{% if total_guests != 1 %}s{% endif %}</span>
+                        </button>
+                        <div class="dropdown-menu guest-dropdown p-3" onclick="event.stopPropagation()">
+                            <div class="guest-counter">
+                                <span>Adults</span>
+                                <div class="d-flex align-items-center">
+                                    <button type="button" class="counter-btn" onclick="updateGuests('adults', -1)">-</button>
+                                    <span id="adultsCount" class="mx-3">{{ total_guests }}</span>
+                                    <button type="button" class="counter-btn" onclick="updateGuests('adults', 1)">+</button>
+                                </div>
+                            </div>
+                            <div class="room-type-info mt-3">
+                                <small class="text-muted">
+                                    Standard: 1 guest<br>
+                                    Double: 2 guests (10% extra)<br>
+                                    Family: up to 4 guests
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="guests" id="adultsInput" value="{{ total_guests }}">
+                </div>
+
+                <!-- Currency -->
+                <div class="mb-3">
+                    <label class="form-label">Currency</label>
+                    <div class="dropdown">
+                        <button class="form-control text-start dropdown-toggle" 
+                                type="button" 
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <span id="currencySummary">
+                                {{ selected_currency }} 
+                                ({% for curr in currencies %}
+                                    {% if curr.code == selected_currency %}{{ curr.symbol }}{% endif %}
+                                {% endfor %})
+                            </span>
+                        </button>
+                        <div class="dropdown-menu guest-dropdown p-3" onclick="event.stopPropagation()">
+                            {% for currency in currencies %}
+                                <div class="dropdown-item currency-option" 
+                                    data-code="{{ currency.code }}"
+                                    data-symbol="{{ currency.symbol }}">
+                                    {{ currency.code }} ({{ currency.symbol }})
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <input type="hidden" name="currency" id="currencyInput" value="{{ selected_currency }}">
+                </div>
+
+                <!-- Update Button -->
+                <button id="updateBooking" class="btn btn-dark w-100 mt-3">
+                    Update Booking Details
+                </button>
+
+                <!-- Advance Booking Discount -->
+                {% if discount_percentage > 0 %}
+                <div class="alert alert-success mt-3" role="alert">
+                    <i class="fas fa-tag"></i>
+                    {{ discount_percentage }}% advance booking discount applied!
+                    <small class="d-block text-muted">
+                        Booking {{ days_in_advance }} days in advance
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const MAX_CAPACITY = parseInt("{{ max_room_capacity }}");
+    
+    // Common config for both date pickers
+    const commonConfig = {
+        disableMobile: "true",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "F j, Y",
+        allowInput: false
+    };
+
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 90); // 3 months advance booking limit
+
+    // Initialize Flatpickr for check-in
+    const checkInPicker = flatpickr('#checkInDate', {
+        ...commonConfig,
+        minDate: today,
+        maxDate: maxDate,
+        defaultDate: "{{ check_in|date }}",
+        onChange: function(selectedDates) {
+            if (selectedDates[0]) {
+                const minCheckOut = new Date(selectedDates[0]);
+                minCheckOut.setDate(minCheckOut.getDate() + 1);
+                
+                const maxCheckOut = new Date(selectedDates[0]);
+                maxCheckOut.setDate(maxCheckOut.getDate() + 30);
+                
+                checkOutPicker.set('minDate', minCheckOut);
+                checkOutPicker.set('maxDate', maxCheckOut);
+                
+                checkOutPicker.clear();
+                setTimeout(() => checkOutPicker.open(), 100);
+            }
+        }
+    });
+
+    // Initialize Flatpickr for check-out
+    const checkOutPicker = flatpickr('#checkOutDate', {
+        ...commonConfig,
+        defaultDate: "{{ check_out|date }}"
+    });
+
+    // Update button handler
+    document.getElementById('updateBooking').addEventListener('click', function() {
+        // Validate dates
+        const checkIn = checkInPicker.selectedDates[0];
+        const checkOut = checkOutPicker.selectedDates[0];
+        
+        if (!checkIn || !checkOut) {
+            alert('Please select both check-in and check-out dates');
+            return;
+        }
+
+        if (checkOut <= checkIn) {
+            alert('Check-out date must be after check-in date');
+            return;
+        }
+
+        const nights = Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+        if (nights > 30) {
+            alert('Maximum stay is 30 nights');
+            return;
+        }
+
+        // Get values from hidden inputs instead of select elements
+        const guests = document.getElementById('adultsInput').value;
+        const currency = document.getElementById('currencyInput').value;
+
+        // Update URL with new parameters
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('check_in', checkIn.toISOString().split('T')[0]);
+        newUrl.searchParams.set('check_out', checkOut.toISOString().split('T')[0]);
+        newUrl.searchParams.set('guests', guests);
+        newUrl.searchParams.set('currency', currency);
+        
+        window.location.href = newUrl.toString();
+    });
+
+    // Guest counter functionality
+    window.guests = {
+        adults: parseInt("{{ total_guests }}")
+    };
+
+    window.updateGuests = function(type, change) {
+        const newValue = guests[type] + change;
+        if (type === 'adults' && (newValue < 1 || newValue > MAX_CAPACITY)) return;
+        
+        guests[type] = newValue;
+        document.getElementById(`${type}Count`).textContent = newValue;
+        document.getElementById(`${type}Input`).value = newValue;
+        document.getElementById('guestSummary').textContent = 
+            `${newValue} Guest${newValue > 1 ? 's' : ''}`;
+        updateCounterButtonStates();
+    };
+
+    function updateCounterButtonStates() {
+        document.querySelector('[onclick="updateGuests(\'adults\', -1)"]').disabled = guests.adults <= 1;
+        document.querySelector('[onclick="updateGuests(\'adults\', 1)"]').disabled = 
+            guests.adults >= MAX_CAPACITY;
+    }
+
+    // Initialize counter button states
+    updateCounterButtonStates();
+
+    // Currency selection
+    document.querySelectorAll('.currency-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const code = this.dataset.code;
+            document.getElementById('currencySummary').textContent = this.textContent.trim();
+            document.getElementById('currencyInput').value = code;
+        });
+    });
+});
+</script>
+{% endblock %}

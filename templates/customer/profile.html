@@ -1,0 +1,219 @@
+{% extends 'common/base.html' %}
+
+{% block title %}My Profile - World Hotels{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Profile Container */
+    .profile-container {
+        padding: 4rem 0;
+        background: linear-gradient(rgba(154, 138, 120, 0.1), rgba(154, 138, 120, 0.05));
+    }
+
+    /* Profile Card */
+    .profile-card {
+        border: none;
+        border: 1px solid var(--accent-color);
+        border-radius: 0;
+    }
+
+    .profile-card .card-header {
+        background: #f8f9fa;
+        border-bottom: 2px solid var(--accent-color);
+        padding: 1.5rem;
+    }
+
+    .profile-card .card-header h4 {
+        font-family: var(--font-display);
+        color: var(--text-dark);
+        font-weight: 300;
+        margin: 0;
+    }
+
+    .profile-card .card-body {
+        padding: 2rem;
+    }
+
+    .profile-card .card-footer {
+        background: #f8f9fa;
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Form Styling */
+    .form-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border-radius: 0;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+        font-size: 0.95rem;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        border-color: var(--accent-color);
+    }
+
+    /* Button Styling */
+    .btn {
+        border-radius: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-dark {
+        background: var(--primary-color);
+        border: none;
+    }
+
+    .btn-dark:hover {
+        background: var(--accent-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .btn-outline-dark {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    .btn-outline-dark:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    /* Icons */
+    .bi {
+        margin-right: 0.5rem;
+    }
+
+    /* Footer Text */
+    .card-footer small {
+        color: #6c757d;
+    }
+
+    .card-footer small i {
+        color: var(--accent-color);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .profile-container {
+            padding: 2rem 0;
+        }
+
+        .profile-card .card-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .profile-card .card-header .btn {
+            margin-top: 1rem;
+        }
+
+        .profile-card .card-footer {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .profile-card .card-footer small {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-card .card-footer small:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .container {
+            width: 99% !important;
+            max-width: none;
+        }
+    }
+    
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="profile-card card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">{{ user.first_name }}'s Profile</h4>
+                        <a href="{{ url_for('change_password') }}" class="btn btn-outline-dark btn-sm">
+                            <i class="fas fa-key"></i> Change Password
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" class="needs-validation" novalidate>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           name="first_name"
+                                           value="{{ user.first_name }}"
+                                           required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           name="last_name"
+                                           value="{{ user.last_name }}"
+                                           required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" 
+                                           class="form-control" 
+                                           name="email"
+                                           value="{{ user.email }}"
+                                           required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" 
+                                           class="form-control" 
+                                           name="phone"
+                                           value="{{ user.phone_number }}">
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-dark">
+                                        <i class="fas fa-save"></i> Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <small>
+                            <i class="fas fa-clock"></i></i> Member since: {{ user.created_at|date }}
+                        </small>
+                        {% if user.total_bookings %}
+                        <small>
+                            <i class="fas fa-bookmark"></i> Total Bookings: {{ user.total_bookings }}
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

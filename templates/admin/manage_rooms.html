@@ -1,0 +1,229 @@
+<!-- templates/admin/manage_rooms.html -->
+{% extends 'admin/layout.html' %}
+
+{% block title %}Manage Rooms - World Hotels{% endblock %}
+
+{% block page_title %}
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 w-100">
+    <h1 class="h3 mb-0">Manage Rooms</h1>
+    <a href="{{ url_for('add_room') }}" class="btn btn-dark">
+        <i class="bi bi-plus-lg"></i> Add New Room
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-3">
+                <label class="form-label">Hotel</label>
+                <select name="hotel_id" class="form-select">
+                    <option value="">All Hotels</option>
+                    {% for hotel in hotels %}
+                    <option value="{{ hotel.hotel_id }}" 
+                            {% if current_hotel|int == hotel.hotel_id %}selected{% endif %}>
+                        {{ hotel.hotel_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Room Type</label>
+                <select name="room_type" class="form-select">
+                    <option value="">All Types</option>
+                    {% for type in room_types %}
+                    <option value="{{ type.type_name }}" 
+                            {% if current_type == type.type_name %}selected{% endif %}>
+                        {{ type.type_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="available" {% if current_status == 'available' %}selected{% endif %}>
+                        Available
+                    </option>
+                    <option value="booked" {% if current_status == 'booked' %}selected{% endif %}>
+                        Booked
+                    </option>
+                    <option value="maintenance" {% if current_status == 'maintenance' %}selected{% endif %}>
+                        Maintenance
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Floor</label>
+                <input type="number" name="floor" class="form-control" 
+                       value="{{ current_floor }}" min="1">
+            </div>
+            <div class="col-md-1">
+                <label class="form-label">&nbsp;</label>
+                <div>
+                    <button type="submit" class="btn btn-dark">
+                        <i class="bi bi-filter"></i>
+                    </button>
+                    <a href="{{ url_for('manage_rooms') }}" class="btn btn-outline-dark">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Rooms Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Room</th>
+                        <th>Hotel</th>
+                        <th>Type</th>
+                        <th>Floor</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for room in rooms %}
+                    <tr>
+                        <td>{{ room.room_number }}</td>
+                        <td>{{ room.hotel_name }}</td>
+                        <td>{{ room.type_name }}</td>
+                        <td>{{ room.floor_number }}</td>
+                        <td>£{{ "%.2f"|format(room.base_price) }}</td>
+                        <td>
+                            <span class="badge bg-{{ room.status }} text-dark">
+                                {{ room.status|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ url_for('edit_room', room_id=room.room_id) }}" 
+                                   class="btn btn-sm btn-outline-dark">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" 
+                                        class="btn btn-sm btn-outline-dark"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#roomModal{{ room.room_id }}">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Room Details Modal -->
+                    <div class="modal fade" id="roomModal{{ room.room_id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        Room {{ room.room_number }} Details
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    {% if room.room_image %}
+                                    <img src="{{ room.room_image }}" 
+                                         class="img-fluid rounded mb-3" 
+                                         alt="Room Image">
+                                    {% endif %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Hotel:</strong> {{ room.hotel_name }}</p>
+                                            <p><strong>Room Type:</strong> {{ room.type_name }}</p>
+                                            <p><strong>Floor:</strong> {{ room.floor_number }}</p>
+                                            <p><strong>Base Price:</strong> £{{ "%.2f"|format(room.base_price) }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Status:</strong> {{ room.status|title }}</p>
+                                            <p><strong>Active Bookings:</strong> {{ room.active_bookings }}</p>
+                                            <p><strong>Features:</strong></p>
+                                            <div>
+                                                {% for feature in room.features %}
+                                                <span class="badge bg-secondary">{{ feature.feature_name }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <!-- Pagination -->
+            <div class="pagination-container mt-4">
+                <div class="text-muted">
+                    Showing {{ hotels|length }} of {{ total_hotels }} hotels
+                </div>
+                
+                {% if total_pages > 1 %}
+                <nav aria-label="Rooms navigation">
+                    <ul class="pagination">
+                        {% if page > 1 %}
+                        <li class="page-item prev-item">
+                            <a class="page-link" href="{{ url_for('manage_rooms', page=page-1, status=current_status, city=current_city, search=search) }}">
+                                <i class="bi bi-arrow-left"></i> Previous
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <li class="page-numbers">
+                            <div class="d-flex gap-1">
+                                {# First page #}
+                                {% if page > 3 %}
+                                <a class="page-link" href="{{ url_for('manage_rooms', page=1, status=current_status, city=current_city, search=search) }}">1</a>
+                                {% if page > 4 %}
+                                <span class="page-link disabled">...</span>
+                                {% endif %}
+                                {% endif %}
+                                
+                                {# Pages around current page #}
+                                {% for p in range(page - 2, page + 3) %}
+                                    {% if p > 0 and p <= total_pages %}
+                                    <a class="page-link {{ 'active' if p == page }}" 
+                                    href="{{ url_for('manage_rooms', page=p, status=current_status, city=current_city, search=search) }}">
+                                        {{ p }}
+                                    </a>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {# Last page #}
+                                {% if page < total_pages - 2 %}
+                                {% if page < total_pages - 3 %}
+                                <span class="page-link disabled">...</span>
+                                {% endif %}
+                                <a class="page-link" href="{{ url_for('manage_rooms', page=total_pages, status=current_status, city=current_city, search=search) }}">
+                                    {{ total_pages }}
+                                </a>
+                                {% endif %}
+                            </div>
+                        </li>
+                        
+                        {% if page < total_pages %}
+                        <li class="page-item next-item">
+                            <a class="page-link" href="{{ url_for('manage_rooms', page=page+1, status=current_status, city=current_city, search=search) }}">
+                                Next <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

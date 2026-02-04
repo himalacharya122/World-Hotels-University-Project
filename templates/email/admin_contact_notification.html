@@ -1,0 +1,14 @@
+{% extends 'email/base_email.html' %}
+
+{% block content %}
+<h2>New Contact Form Submission</h2>
+<div class="contact-details">
+    <p><strong>Name:</strong> {{ name }}</p>
+    <p><strong>Email:</strong> {{ email }}</p>
+    <p><strong>Subject:</strong> {{ subject_text }}</p>
+    <h3>Message:</h3>
+    <div class="message">
+        {{ message }}
+    </div>
+</div>
+{% endblock %}

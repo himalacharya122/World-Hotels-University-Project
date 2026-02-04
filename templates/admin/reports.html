@@ -1,0 +1,367 @@
+<!-- templates/admin/reports.html -->
+{% extends 'admin/layout.html' %}
+
+{% block title %}Reports & Analytics - World Hotels{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" rel="stylesheet">
+{% endblock %}
+
+{% block page_title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<!-- Date Range Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-4">
+                <label class="form-label">Date Range</label>
+                <select name="date_range" class="form-select" id="dateRangeSelect">
+                    <option value="last_7_days" {% if date_range == 'last_7_days' %}selected{% endif %}>
+                        Last 7 Days
+                    </option>
+                    <option value="last_30_days" {% if date_range == 'last_30_days' %}selected{% endif %}>
+                        Last 30 Days
+                    </option>
+                    <option value="last_90_days" {% if date_range == 'last_90_days' %}selected{% endif %}>
+                        Last 90 Days
+                    </option>
+                    <option value="custom" {% if date_range == 'custom' %}selected{% endif %}>
+                        Custom Range
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-6" id="customDateInputs" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" class="form-control" 
+                               value="{{ custom_start }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">End Date</label>
+                        <input type="date" name="end_date" class="form-control" 
+                               value="{{ custom_end }}">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-dark d-block">
+                    <i class="bi bi-filter"></i> Apply Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Export Options -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="card-title mb-0">Export Options</h5>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('export_report_pdf', 
+                                  date_range=date_range, 
+                                  start_date=custom_start, 
+                                  end_date=custom_end) }}" 
+                   class="btn btn-dark">
+                    <i class="bi bi-file-pdf"></i> Export PDF
+                </a>
+                <a href="{{ url_for('export_report_excel', 
+                                  date_range=date_range, 
+                                  start_date=custom_start, 
+                                  end_date=custom_end) }}" 
+                   class="btn btn-dark">
+                    <i class="bi bi-file-excel"></i> Export Excel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted mb-0">Total Bookings</h6>
+                <h2 class="mt-2 mb-0">{{ booking_stats.total_bookings }}</h2>
+                <div class="mt-2">
+                    <span class="badge bg-success">
+                        {{ booking_stats.confirmed_bookings }} Confirmed
+                    </span>
+                    <span class="badge bg-danger">
+                        {{ booking_stats.cancelled_bookings }} Cancelled
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted mb-0">Total Revenue</h6>
+                <h2 class="mt-2 mb-0">£{{ "%.2f"|format(booking_stats.total_revenue) }}</h2>
+                <div class="mt-2 text-muted">
+                    Avg. £{{ "%.2f"|format(booking_stats.avg_booking_value) }} per booking
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted mb-0">Average Stay Duration</h6>
+                <h2 class="mt-2 mb-0">{{ "%.1f"|format(booking_stats.avg_stay_duration or 0) }}</h2>
+                <div class="mt-2 text-muted">nights per booking</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Revenue Chart -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Daily Revenue Trend</h5>
+    </div>
+    <div class="card-body">
+        <div class="chart-container">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Hotel Performance -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Hotel Revenue</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="hotelRevenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Occupancy Rates</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="occupancyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Room Type Performance -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Room Type Performance</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Room Type</th>
+                        <th>Bookings</th>
+                        <th>Revenue</th>
+                        <th>Average Rate</th>
+                        <th>Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for type in room_type_stats %}
+                    <tr>
+                        <td>{{ type.type_name }}</td>
+                        <td>{{ type.booking_count }}</td>
+                        <td>£{{ "%.2f"|format(type.revenue or 0) }}</td>
+                        <td>£{{ "%.2f"|format(type.avg_rate or 0) }}</td>
+                        <td>
+                            <div class="progress" style="height: 5px;">
+                                <div class="progress-bar" role="progressbar" 
+                                style="width: {{ ((type.revenue or 0) / (room_type_stats[0].revenue or 1) * 100)|round }}%">
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Top Customers -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Top Customers</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Bookings</th>
+                        <th>Total Spent</th>
+                        <th>Last Booking</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in top_customers %}
+                    <tr>
+                        <td>{{ customer.full_name }}</td>
+                        <td>{{ customer.booking_count }}</td>
+                        <td>£{{ "%.2f"|format(customer.total_spent) }}</td>
+                        <td>{{ customer.last_booking|date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/moment/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script>
+// Date range picker initialization
+document.addEventListener('DOMContentLoaded', function() {
+    const dateRangeSelect = document.getElementById('dateRangeSelect');
+    const customDateInputs = document.getElementById('customDateInputs');
+    
+    dateRangeSelect.addEventListener('change', function() {
+        customDateInputs.style.display = 
+            this.value === 'custom' ? 'block' : 'none';
+    });
+    
+    if (dateRangeSelect.value === 'custom') {
+        customDateInputs.style.display = 'block';
+    }
+});
+
+// Initialize chart data
+const chartData = {
+    daily: {
+        labels: JSON.parse('{{ daily_revenue|map(attribute="date")|list|tojson|safe }}'),
+        values: JSON.parse('{{ daily_revenue|map(attribute="revenue")|list|tojson|safe }}')
+    },
+    hotel: {
+        labels: JSON.parse('{{ hotel_revenue|map(attribute="hotel_name")|list|tojson|safe }}'),
+        values: JSON.parse('{{ hotel_revenue|map(attribute="revenue")|list|tojson|safe }}')
+    },
+    occupancy: {
+        labels: JSON.parse('{{ occupancy_rates|map(attribute="hotel_name")|list|tojson|safe }}'),
+        values: JSON.parse('{{ occupancy_rates|map(attribute="occupied_rooms")|list|tojson|safe }}')
+    }
+};
+
+// Revenue Chart
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+        labels: chartData.daily.labels,
+        datasets: [{
+            label: 'Daily Revenue',
+            data: chartData.daily.values,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '£' + value;
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Hotel Revenue Chart
+const hotelRevenueCtx = document.getElementById('hotelRevenueChart').getContext('2d');
+new Chart(hotelRevenueCtx, {
+    type: 'bar',
+    data: {
+        labels: chartData.hotel.labels,
+        datasets: [{
+            label: 'Revenue',
+            data: chartData.hotel.values,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgb(75, 192, 192)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '£' + value;
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Occupancy Chart
+const occupancyCtx = document.getElementById('occupancyChart').getContext('2d');
+new Chart(occupancyCtx, {
+    type: 'doughnut',
+    data: {
+        labels: chartData.occupancy.labels,
+        datasets: [{
+            data: chartData.occupancy.values,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

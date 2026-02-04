@@ -1,0 +1,12 @@
+{% extends 'email/base_email.html' %}
+
+{% block content %}
+<h2>Thank you for contacting World Hotels</h2>
+<p>Dear {{ name }},</p>
+<p>We have received your message and will get back to you as soon as possible.</p>
+<div class="contact-details">
+    <p><strong>Subject:</strong> {{ subject_text }}</p>
+    <div class="message">{{ message }}</div>
+</div>
+<p>Best regards,<br>World Hotels Team</p>
+{% endblock %}

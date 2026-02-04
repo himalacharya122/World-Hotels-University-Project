@@ -1,0 +1,94 @@
+{% extends 'common/base.html' %}
+
+{% block title %}Unsubscribe{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .unsubscribe-section {
+            padding: 6rem 0;
+            background-color: #f8f9fa;
+            min-height: calc(100vh - var(--header-height) - var(--footer-height));
+            display: flex;
+            align-items: center;
+        }
+
+        .unsubscribe-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            color: #1a1a1a;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+        }
+
+        .unsubscribe-message {
+            font-size: 1.1rem;
+            color: #666;
+            margin: 2rem 0 1rem;
+        }
+
+        .unsubscribe-submessage {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .btn-unsubscribe {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #1a1a1a;
+            color: white !important;
+            text-decoration: none;
+            border: none;
+            margin: 20px 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-unsubscribe:hover {
+            background-color: #9D8E7C;
+        }
+
+        .btn-group-unsubscribe {
+            margin: 1rem 0;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .unsubscribe-section {
+                padding: 4rem 1rem;
+            }
+            .btn-group-unsubscribe {
+                flex-direction: column;
+            }
+            .btn-unsubscribe {
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section class="unsubscribe-section">
+    <div class="container">
+        <div class="unsubscribe-wrapper text-center">
+            {% if error %}
+                <h2 class="section-title">Invalid Unsubscribe Link</h2>
+                <p class="unsubscribe-message">The unsubscribe link appears to be invalid or expired.</p>
+                <a href="{{ url_for('index') }}" class="btn-unsubscribe">Return to Homepage</a>
+            {% else %}
+                <h2 class="section-title">Unsubscribed Successfully</h2>
+                <p class="unsubscribe-message">You have been successfully unsubscribed from our newsletter.</p>
+                <p class="unsubscribe-submessage">We're sorry to see you go. You can always subscribe again from our homepage.</p>
+                <a href="{{ url_for('index') }}" class="btn-unsubscribe">Return to Homepage</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

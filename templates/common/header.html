@@ -1,0 +1,91 @@
+<!-- Main Header -->
+<header class="main-header" id="mainHeader">
+    <nav class="navbar">
+        <div class="container-fluid">
+            <!-- Hamburger Menu Button -->
+            <div class="header-left">
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbarOffcanvas" aria-controls="navbarOffcanvas">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                </button>
+            </div>
+
+            <!-- Center logo -->
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="World Hotels" class="brand-logo">
+            </a>
+
+            <!-- Right side buttons -->
+            <div class="header-right">
+                <div class="d-flex align-items-center gap-4">
+                    <a href="{{ url_for('search') }}" class="nav-link search-link">
+                        <i class="fas fa-utensils d-lg-none"></i>
+                        <span class="d-none d-lg-inline">Reserve Now</span>
+                    </a>
+                    {% if 'user_id' in session %}
+                        <div class="user-dropdown">
+                            <button class="user-dropdown-btn">
+                                <i class="fas fa-user"></i>
+                                <span class="d-none d-lg-inline ms-2">{{ session.get('first_name') }}</span>
+                            </button>
+                            <div class="user-dropdown-content">
+                                {% if session.get('is_admin') %}
+                                    <a href="{{ url_for('admin_dashboard') }}">
+                                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                    </a>
+                                    <div class="divider"></div>
+                                {% endif %}
+                                <a href="{{ url_for('my_bookings') }}">
+                                    <i class="fas fa-bookmark me-2"></i>My Bookings
+                                </a>
+                                <a href="{{ url_for('profile') }}">
+                                    <i class="fas fa-cog me-2"></i>Settings
+                                </a>
+                                <a href="{{ url_for('logout') }}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="nav-link">
+                            <i class="fas fa-user"></i>
+                            <span class="d-none d-lg-inline ms-2">Login</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Off-canvas menu -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="navbarOffcanvas" aria-labelledby="navbarOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="navbarOffcanvasLabel"><img src="{{ url_for('static', filename='images/world_hotels_logo_white.png') }}" alt="World Hotels" class="brand-logo"></h5>
+            <button type="button" class="custom-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="navbar-nav">
+                {% if 'user_id' in session %}
+                    {% if session.get('is_admin') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('destinations') }}">Destinations</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('about') }}">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('contact') }}">Contact Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('gallery') }}">Experiences</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>

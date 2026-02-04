@@ -1,0 +1,266 @@
+<!-- templates/admin/manage_hotels.html -->
+{% extends 'admin/layout.html' %}
+
+{% block title %}Manage Hotels - World Hotels{% endblock %}
+
+{% block page_title %}
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-center align-items-sm-center gap-3 w-100">
+    <h1 class="h3 mb-0">Manage Hotels</h1>
+    <a href="{{ url_for('add_hotel') }}" class="btn btn-dark">
+        <i class="bi bi-plus-lg"></i> Add New Hotel
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="active" {% if current_status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if current_status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">City</label>
+                <select name="city" class="form-select">
+                    <option value="">All Cities</option>
+                    {% for city_option in cities %}
+                    <option value="{{ city_option.city }}" 
+                            {% if current_city == city_option.city %}selected{% endif %}>
+                        {{ city_option.city }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Search</label>
+                <input type="text" name="search" class="form-control" 
+                       value="{{ search }}" placeholder="Hotel name or address">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div>
+                    <button type="submit" class="btn btn-dark">
+                        <i class="bi bi-filter"></i> Filter
+                    </button>
+                    <a href="{{ url_for('manage_hotels') }}" class="btn btn-outline-dark">
+                        Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Hotels Grid -->
+{% if hotels %}
+<div class="row g-4">
+    {% for hotel in hotels %}
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            {% if hotel.hotel_image %}
+            <img src="{{ hotel.hotel_image }}" class="card-img-top" alt="{{ hotel.hotel_name }}"
+                 style="height: 200px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title mb-0">{{ hotel.hotel_name }}</h5>
+                    <span class="badge bg-{{ 'success' if hotel.status == 'active' else 'secondary' }}">
+                        {{ hotel.status|title }}
+                    </span>
+                </div>
+                <p class="card-text text-muted">
+                    <i class="bi bi-geo-alt"></i> {{ hotel.city }}
+                </p>
+
+                <!-- Room Capacity Section -->
+                <h6>Room Capacity</h6>
+                <div class="progress-stacked mb-2">
+                    <div class="progress" role="progressbar" style="width: 30%">
+                        <div class="progress-bar bg-success" style="width: {{ (hotel.current_standard_rooms / hotel.standard_rooms * 100) if hotel.standard_rooms > 0 else 0 }}%">
+                            Standard
+                        </div>
+                    </div>
+                    <div class="progress" role="progressbar" style="width: 50%">
+                        <div class="progress-bar bg-info" style="width: {{ (hotel.current_double_rooms / hotel.double_rooms * 100) if hotel.double_rooms > 0 else 0 }}%">
+                            Double
+                        </div>
+                    </div>
+                    <div class="progress" role="progressbar" style="width: 20%">
+                        <div class="progress-bar bg-warning" style="width: {{ (hotel.current_family_rooms / hotel.family_rooms * 100) if hotel.family_rooms > 0 else 0 }}%">
+                            Family
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="border rounded p-2 text-center">
+                            <small class="d-block text-muted">Total Rooms</small>
+                            <strong>{{ hotel.current_rooms }}/{{ hotel.total_capacity }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="border rounded p-2 text-center">
+                            <small class="d-block text-muted">Available</small>
+                            <strong>{{ hotel.available_rooms }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Type Distribution -->
+                <div class="small text-muted mb-3">
+                    <div>Standard: {{ hotel.current_standard_rooms }}/{{ hotel.standard_rooms }}</div>
+                    <div>Double: {{ hotel.current_double_rooms }}/{{ hotel.double_rooms }}</div>
+                    <div>Family: {{ hotel.current_family_rooms }}/{{ hotel.family_rooms }}</div>
+                </div>
+
+                <!-- Warning for incorrect distribution -->
+                {% if hotel.current_rooms > 0 and (
+                    hotel.current_standard_rooms > hotel.standard_rooms or
+                    hotel.current_double_rooms > hotel.double_rooms or
+                    hotel.current_family_rooms > hotel.family_rooms
+                ) %}
+                <div class="alert alert-warning mb-3 py-2 small">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Room distribution needs adjustment
+                </div>
+                {% endif %}
+
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('edit_hotel', hotel_id=hotel.hotel_id) }}" 
+                       class="btn btn-outline-dark flex-grow-1">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                    <button type="button" class="btn btn-outline-dark btn-modal"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#detailsModal{{ hotel.hotel_id }}">
+                        <i class="bi bi-info-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Details Modal -->
+        <div class="modal fade" id="detailsModal{{ hotel.hotel_id }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ hotel.hotel_name }} Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Contact Information</h6>
+                                <p>
+                                    <i class="bi bi-telephone"></i> {{ hotel.contact_number }}<br>
+                                    <i class="bi bi-envelope"></i> {{ hotel.email }}<br>
+                                    <i class="bi bi-geo-alt"></i> {{ hotel.address }}
+                                </p>
+                                
+                                <h6>Check-in/out Times</h6>
+                                <p>
+                                    Check-in: {{ hotel.check_in_time|time }}<br>
+                                    Check-out: {{ hotel.check_out_time|time }}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Amenities</h6>
+                                <ul class="list-unstyled">
+                                    {% for amenity in hotel.amenities %}
+                                    <li>
+                                        <i class="bi bi-check-circle text-success"></i>
+                                        {{ amenity.amenity_name }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <h6>Description</h6>
+                        <p>{{ hotel.description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+<div class="pagination-container mt-4">
+    <div class="text-muted">
+        Showing {{ hotels|length }} of {{ total_hotels }} hotels
+    </div>
+    
+    {% if total_pages > 1 %}
+    <nav aria-label="Hotel navigation">
+        <ul class="pagination">
+            {% if page > 1 %}
+            <li class="page-item prev-item">
+                <a class="page-link" href="{{ url_for('manage_hotels', page=page-1, status=current_status, city=current_city, search=search) }}">
+                    <i class="bi bi-arrow-left"></i> Previous
+                </a>
+            </li>
+            {% endif %}
+            
+            <li class="page-numbers">
+                <div class="d-flex gap-1">
+                    {# First page #}
+                    {% if page > 3 %}
+                    <a class="page-link" href="{{ url_for('manage_hotels', page=1, status=current_status, city=current_city, search=search) }}">1</a>
+                    {% if page > 4 %}
+                    <span class="page-link disabled">...</span>
+                    {% endif %}
+                    {% endif %}
+                    
+                    {# Pages around current page #}
+                    {% for p in range(page - 2, page + 3) %}
+                        {% if p > 0 and p <= total_pages %}
+                        <a class="page-link {{ 'active' if p == page }}" 
+                           href="{{ url_for('manage_hotels', page=p, status=current_status, city=current_city, search=search) }}">
+                            {{ p }}
+                        </a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {# Last page #}
+                    {% if page < total_pages - 2 %}
+                    {% if page < total_pages - 3 %}
+                    <span class="page-link disabled">...</span>
+                    {% endif %}
+                    <a class="page-link" href="{{ url_for('manage_hotels', page=total_pages, status=current_status, city=current_city, search=search) }}">
+                        {{ total_pages }}
+                    </a>
+                    {% endif %}
+                </div>
+            </li>
+            
+            {% if page < total_pages %}
+            <li class="page-item next-item">
+                <a class="page-link" href="{{ url_for('manage_hotels', page=page+1, status=current_status, city=current_city, search=search) }}">
+                    Next <i class="bi bi-arrow-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="bi bi-calendar-x" style="font-size: 3rem; color: #ccc;"></i>
+    <h5 class="mt-3">No Hotels Found</h5>
+    <p class="text-muted">Try adjusting your filters or clearing them to see more results.</p>
+    <a href="{{ url_for('manage_hotels') }}" class="btn btn-outline-dark mt-2">
+        Clear All Filters
+    </a>
+</div>
+{% endif %}
+{% endblock %}

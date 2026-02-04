@@ -1,0 +1,551 @@
+<!-- templates/customer/my_bookings.html -->
+{% extends 'common/base.html' %}
+
+{% block title %}My Bookings - World Hotels{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Page Header */
+    .page-header {
+        background: linear-gradient(rgba(154, 138, 120, 0.1), rgba(154, 138, 120, 0.05));
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-family: var(--font-display);
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    /* Filters Section */
+    .booking-filters {
+        background: white;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--accent-color);
+        background-color: white !important;
+    }
+
+    /* Custom Dropdown Styling */
+    .dropdown-toggle.form-control {
+        background: white;
+        text-align: left;
+        position: relative;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+        cursor: pointer;
+        font-size: 0.95rem;
+        color: #495057;
+        border-radius: 0 !important;
+    }
+
+    .dropdown-toggle.form-control::after {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .dropdown-menu {
+        width: 100%;
+        border-radius: 0;
+        border: none;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        padding: 0.5rem 0;
+    }
+
+    .dropdown-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        border-bottom: 1px solid #dee2e6;
+        font-size: 0.95rem;
+        color: #495057;
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Form Labels */
+    .form-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Button Styling */
+    .btn-dark {
+        height: 48px;
+        border-radius: 0;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        background: #000;
+        border: none;
+    }
+
+    .btn-dark:hover {
+        background: #9D8E7C;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Filters Container */
+    .booking-filters {
+        background: #F8F9FA;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .booking-filters {
+            padding: 1rem;
+        }
+        
+        .btn-dark {
+            margin-top: 1rem;
+        }
+    }
+
+    /* Booking Cards */
+    .booking-card {
+        background: white;
+        margin-bottom: 4rem;
+        border: 1px solid var(--accent-color);
+    }
+
+    .booking-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #eee;
+        background: #f8f9fa;
+    }
+
+    .booking-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .booking-body {
+        padding: 1.5rem;
+    }
+
+    .hotel-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border: 1px solid #eee;
+    }
+
+    .booking-body h4 {
+        font-family: var(--font-display);
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .booking-body i {
+        color: var(--accent-color);
+        width: 20px;
+        margin-right: 0.5rem;
+    }
+
+    .booking-actions {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #eee;
+        background: #f8f9fa;
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+        padding: 0.75rem 1.5rem;
+        transition: var(--transition);
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-dark {
+        background: var(--primary-color);
+        border: none;
+    }
+
+    .btn-dark:hover {
+        background: var(--accent-color);
+    }
+
+    .btn-outline-dark {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    .btn-outline-dark:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-bookings {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    }
+
+    .empty-bookings h3 {
+        font-family: var(--font-display);
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+
+    /* Pagination */
+    .pagination {
+        margin-top: 2rem;
+        justify-content: center;
+    }
+
+    .page-link {
+        color: var(--text-dark);
+        border: none;
+        padding: 0.75rem 1rem;
+        margin: 0 0.25rem;
+        transition: var(--transition);
+    }
+
+    .page-link:hover {
+        background: var(--accent-color);
+        color: white;
+    }
+
+    .page-item.active .page-link {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    /* Modal Customization */
+    .modal-content {
+        border-radius: 0;
+    }
+
+    .modal-header {
+        background: #f8f9fa;
+        border-bottom: 2px solid var(--accent-color);
+    }
+
+    .modal-title {
+        font-family: var(--font-display);
+        color: var(--text-dark);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .booking-body .row {
+            flex-direction: column;
+        }
+
+        .hotel-image {
+            margin-bottom: 1rem;
+            height: 200px;
+        }
+
+        .booking-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .booking-header div:last-child {
+            margin-top: 0.5rem;
+        }
+
+        .booking-actions {
+            text-align: center;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header {
+            padding: 2rem 0;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .container {
+            width: 99% !important;
+            max-width: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>My Bookings</h1>
+    </div>
+</div>
+
+
+<div class="container">
+    <!-- Filters -->
+    <div class="booking-filters">
+        <form method="GET" class="row g-3">
+            <!-- Status Dropdown -->
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <div class="dropdown">
+                    <button class="form-control text-start dropdown-toggle" 
+                            type="button" 
+                            data-bs-toggle="dropdown">
+                        <span id="statusSummary">{{ status|title if status else 'All Statuses' }}</span>
+                    </button>
+                    <div class="dropdown-menu guest-dropdown p-3">
+                        <div class="dropdown-item status-option" data-value="">All Statuses</div>
+                        <div class="dropdown-item status-option" data-value="confirmed">Confirmed</div>
+                        <div class="dropdown-item status-option" data-value="pending">Pending</div>
+                        <div class="dropdown-item status-option" data-value="cancelled">Cancelled</div>
+                    </div>
+                </div>
+                <input type="hidden" name="status" id="statusInput" value="{{ status }}">
+            </div>
+    
+            <!-- Date Range Dropdown -->
+            <div class="col-md-3">
+                <label class="form-label">Date Range</label>
+                <div class="dropdown">
+                    <button class="form-control text-start dropdown-toggle" 
+                            type="button" 
+                            data-bs-toggle="dropdown">
+                        <span id="dateRangeSummary">{{ date_range|title if date_range else 'All Time' }}</span>
+                    </button>
+                    <div class="dropdown-menu guest-dropdown p-3">
+                        <div class="dropdown-item date-range-option" data-value="">All Time</div>
+                        <div class="dropdown-item date-range-option" data-value="upcoming">Upcoming</div>
+                        <div class="dropdown-item date-range-option" data-value="past">Past</div>
+                    </div>
+                </div>
+                <input type="hidden" name="date_range" id="dateRangeInput" value="{{ date_range }}">
+            </div>
+    
+            <!-- Sort By Dropdown -->
+            <div class="col-md-3">
+                <label class="form-label">Sort By</label>
+                <div class="dropdown">
+                    <button class="form-control text-start dropdown-toggle" 
+                            type="button" 
+                            data-bs-toggle="dropdown">
+                        <span id="sortSummary">{{ 'Latest First' if sort == 'date_desc' else 'Oldest First' }}</span>
+                    </button>
+                    <div class="dropdown-menu guest-dropdown p-3">
+                        <div class="dropdown-item sort-option" data-value="date_desc">Latest First</div>
+                        <div class="dropdown-item sort-option" data-value="date_asc">Oldest First</div>
+                    </div>
+                </div>
+                <input type="hidden" name="sort" id="sortInput" value="{{ sort }}">
+            </div>
+    
+            <!-- Apply Button -->
+            <div class="col-md-3">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-dark w-100">Apply Filters</button>
+            </div>
+        </form>
+    </div>
+
+    {% if bookings %}
+        {% for booking in bookings %}
+        <div class="booking-card">
+            <div class="booking-header d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="booking-status status-{{ booking.status }}">
+                        {{ booking.status|title }}
+                    </span>
+                    <small class="ms-2 text-muted">
+                        Booking Reference: {{ booking.booking_reference }}
+                    </small>
+                </div>
+                <div>
+                    <strong>{{ booking.final_amount|currency(booking.currency_code) }}</strong>
+                </div>
+            </div>
+            <div class="booking-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        {% if booking.hotel_image %}
+                            <img src="{{ booking.hotel_image }}" 
+                                 alt="{{ booking.hotel_name }}"
+                                 class="hotel-image">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/placeholder-hotel.jpg') }}" 
+                                 alt="{{ booking.hotel_name }}"
+                                 class="hotel-image">
+                        {% endif %}
+
+                    </div>
+                    <div class="col-md-8">
+                        <h4>{{ booking.hotel_name }}</h4>
+                        <p>{{ booking.room_type }} Room</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p>
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Check-in: {{ booking.check_in_date|date }}<br>
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Check-out: {{ booking.check_out_date|date }}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p>
+                                    <i class="fas fa-users"></i>
+                                    {{ booking.number_of_guests }} Guest(s)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="booking-actions">
+                <a href="{{ url_for('booking_confirmation', booking_reference=booking.booking_reference) }}"
+                   class="btn btn-outline-dark btn-sm me-2">
+                    View Details
+                </a>
+                {% if booking.status == 'confirmed' and booking.can_cancel %}
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#cancelModal{{ booking.booking_id }}">
+                    Cancel Booking
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Cancel Modal -->
+        {% if booking.status == 'confirmed' and booking.can_cancel %}
+        <div class="modal fade" id="cancelModal{{ booking.booking_id }}">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cancel Booking</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to cancel this booking?</p>
+                        {% if booking.cancellation_charge > 0 %}
+                        <div class="alert alert-warning">
+                            A cancellation fee of {{ booking.cancellation_charge|currency(booking.currency_code) }} will apply.
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <form action="{{ url_for('cancel_booking', booking_id=booking.booking_id) }}" 
+                              method="POST" 
+                              class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if pages > 1 %}
+        <nav>
+            <ul class="pagination">
+                {% for page in range(1, pages + 1) %}
+                <li class="page-item {{ 'active' if page == current_page else '' }}">
+                    <a class="page-link" href="{{ url_for('my_bookings', page=page, **request.args) }}">
+                        {{ page }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+        {% endif %}
+
+    {% else %}
+        <div class="empty-bookings">
+            <h3>No bookings found</h3>
+            <p class="text-muted">You haven't made any bookings yet.</p>
+            <a href="{{ url_for('search') }}" class="btn btn-dark mt-3">
+                Start Booking
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup status dropdown
+    document.querySelectorAll('.status-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            const value = this.dataset.value;
+            document.getElementById('statusSummary').textContent = this.textContent;
+            document.getElementById('statusInput').value = value;
+            this.closest('.dropdown-menu').classList.remove('show');
+        });
+    });
+
+    // Setup date range dropdown
+    document.querySelectorAll('.date-range-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            const value = this.dataset.value;
+            document.getElementById('dateRangeSummary').textContent = this.textContent;
+            document.getElementById('dateRangeInput').value = value;
+            this.closest('.dropdown-menu').classList.remove('show');
+        });
+    });
+
+    // Setup sort dropdown
+    document.querySelectorAll('.sort-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            const value = this.dataset.value;
+            document.getElementById('sortSummary').textContent = this.textContent;
+            document.getElementById('sortInput').value = value;
+            this.closest('.dropdown-menu').classList.remove('show');
+        });
+    });
+});
+</script>
+{% endblock %}

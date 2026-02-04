@@ -1,0 +1,136 @@
+<!-- templates/admin/add_user.html -->
+{% extends 'admin/layout.html' %}
+
+{% block title %}Add New User - World Hotels{% endblock %}
+
+{% block page_title %}
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 w-100">
+    <h1 class="h3 mb-0">Manage Hotels</h1>
+    <a href="{{ url_for('manage_users') }}" class="btn btn-dark">
+        <i class="bi bi-arrow-left"></i> Back to Users
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <!-- Role Selection -->
+                        <div class="col-md-6">
+                            <label class="form-label">Role</label>
+                            <select name="role_id" class="form-select" required>
+                                <option value="">Select Role</option>
+                                {% for role in roles %}
+                                <option value="{{ role.role_id }}">
+                                    {{ role.role_name|title }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Status</label>
+                            <div class="form-check form-switch mt-2">
+                                <input type="checkbox" name="is_active" class="form-check-input" 
+                                       id="activeSwitch" checked>
+                                <label class="form-check-label" for="activeSwitch">Active</label>
+                            </div>
+                        </div>
+
+                        <!-- Basic Information -->
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" class="form-control" 
+                                required autocomplete="given-name">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" class="form-control" 
+                                required autocomplete="family-name">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" 
+                                required autocomplete="email">
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="phone_number" class="form-control" 
+                                autocomplete="tel">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Address</label>
+                            <textarea name="address" class="form-control" rows="2" 
+                                    autocomplete="street-address"></textarea>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="col-md-6">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control" 
+                                required autocomplete="new-password">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Confirm Password</label>
+                            <input type="password" name="confirm_password" class="form-control" 
+                                required autocomplete="new-password">
+                        </div>
+
+                        <!-- Profile Image -->
+                        <div class="col-12">
+                            <label class="form-label">Profile Image</label>
+                            <input type="file" name="profile_image" class="form-control" accept="image/*">
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-dark">
+                                <i class="bi bi-plus-lg"></i> Add User
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+        const password = form.querySelector('[name="password"]');
+        const confirmPassword = form.querySelector('[name="confirm_password"]');
+    
+        // Validate password strength
+        function validatePasswordStrength(password) {
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+            return regex.test(password);
+        }
+    
+        // Event listener for form submission
+        form.addEventListener('submit', function (e) {
+            if (!validatePasswordStrength(password.value)) {
+                e.preventDefault();
+                alert('Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+                return;
+            }
+    
+            if (password.value !== confirmPassword.value) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+            }
+        });
+    });
+    </script>
+{% endblock %}

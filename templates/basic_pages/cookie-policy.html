@@ -1,0 +1,415 @@
+{% extends 'common/base.html' %}
+
+{% block title %}Cookie Policy - World Hotels{% endblock %}
+
+{% block extra_css %}
+<style>
+    .legal-page {
+        background-color: #fff;
+    }
+
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                    url("{{ url_for('static', filename='images/destination-hero.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        color: white;
+    }
+
+    .hero-content {
+        max-width: 800px;
+    }
+
+    .hero-content h1 {
+        font-size: 3rem;
+        font-weight: 300;
+        margin-bottom: 1rem;
+        font-family: var(--font-display);
+    }
+
+    .legal-content {
+        padding: 4rem 0;
+    }
+
+    .content-section {
+        max-width: 800px;
+        margin: 0 auto 3rem;
+    }
+
+    .content-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .content-section h2 {
+        font-size: 1.8rem;
+        font-weight: 300;
+        margin-bottom: 1.5rem;
+        font-family: var(--font-display);
+        color: var(--primary-color);
+    }
+
+    .content-section h3 {
+        font-size: 1.3rem;
+        margin: 1.5rem 0 1rem;
+        font-family: var(--font-display);
+        color: var(--accent-color);
+    }
+
+    .content-section p {
+        margin-bottom: 1rem;
+        line-height: 1.6;
+        color: #666;
+    }
+
+    .content-section ul {
+        padding-left: 1.5rem;
+        list-style-type: disc;
+        margin-bottom: 1.5rem;
+    }
+
+    .content-section ul li {
+        margin-bottom: 0.5rem;
+        color: #666;
+    }
+
+    .cookie-controls {
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .cookie-controls .btn {
+        padding: 0.9rem 2rem;
+        font-size: 1rem;
+        text-transform: uppercase;
+        border-radius: 0;
+        letter-spacing: 1px;
+        background-color: var(--primary-color);
+        border: none;
+        color: white;
+        transition: background-color 0.3s ease;
+    }
+
+    .cookie-controls .btn:hover {
+        background-color: var(--accent-color);
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            height: 200px;
+        }
+
+        .hero-content h1 {
+            font-size: 2rem;
+        }
+
+        .legal-content {
+            padding: 2rem 1rem;
+        }
+
+        .content-section h2 {
+            font-size: 1.5rem;
+        }
+
+        .cookie-controls .btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+        }
+    }
+
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        overflow-y: auto;
+        border-radius: 0 !important;
+    }
+
+    .modal-dialog {
+        position: relative;
+        width: auto;
+        margin: 1.75rem auto;
+        max-width: 500px;
+        border-radius: 0 !important;
+    }
+
+    .modal-content {
+        position: relative;
+        background-color: #fff;
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 300;
+        font-family: var(--font-display);
+        color: var(--primary-color);
+    }
+
+    .modal-header .close {
+        padding: 1rem;
+        margin: -1rem -1rem -1rem auto;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding: 1.5rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .modal-footer .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: none;
+        transition: background-color 0.3s ease;
+        border-radius: 0;
+    }
+
+    .modal-footer .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .modal-footer .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .modal-footer .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .modal-footer .btn-primary:hover {
+        background-color: var(--accent-color);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: flex;
+        align-items: center;
+        font-weight: 400;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group input[type="checkbox"] {
+        margin-right: 0.75rem;
+        width: 18px;
+        height: 18px;
+    }
+
+    .form-text {
+        display: block;
+        margin-top: 0.25rem;
+        margin-left: 2.25rem;
+        color: #666;
+        font-size: 0.875rem;
+    }
+
+    @media (max-width: 576px) {
+        .modal-dialog {
+            margin: 1rem;
+        }
+        
+        .modal-content {
+            margin: 0;
+        }
+    }
+
+    .alert {
+        color: white;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .alert-success {
+        background-color: var(--accent-color);
+    }
+
+    .alert-danger {
+        background-color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="legal-page">
+    <div class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Cookie Policy</h1>
+                <p>Last updated: {{ now.strftime('%B %d, %Y') }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="legal-content">
+        <div class="container">
+            <div class="content-section">
+                <h2>What Are Cookies</h2>
+                <p>Cookies are small text files that are stored on your computer or mobile device when you visit our website. They help us provide you with a better experience by remembering your preferences, analyzing how our website is used, and personalizing content.</p>
+            </div>
+
+            <div class="content-section">
+                <h2>Types of Cookies We Use</h2>
+                <h3>Essential Cookies</h3>
+                <p>These cookies are necessary for the website to function properly. They enable core functionality such as security, network management, and accessibility.</p>
+
+                <h3>Analytics Cookies</h3>
+                <p>We use analytics cookies to understand how visitors interact with our website, helping us improve our services.</p>
+
+                <h3>Functional Cookies</h3>
+                <p>These cookies enable enhanced functionality and personalization, such as remembering your preferences.</p>
+
+                <h3>Marketing Cookies</h3>
+                <p>These cookies track your online activity to help advertisers deliver more relevant advertising or to limit how many times you see an ad.</p>
+            </div>
+
+            <div class="content-section">
+                <h2>Managing Cookies</h2>
+                <p>You can control and/or delete cookies as you wish. You can delete all cookies that are already on your computer and you can set most browsers to prevent them from being placed.</p>
+                <div class="cookie-controls">
+                    <button class="btn btn-primary" onclick="openCookieSettings()">Cookie Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="cookieSettingsModal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cookie Settings</h2>
+                <button type="button" class="close" onclick="closeCookieSettings()">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Manage your cookie preferences below:</p>
+                <form id="cookiePreferencesForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="essential" checked disabled>
+                            Essential Cookies (Required)
+                        </label>
+                        <small class="form-text">These cookies are necessary for the website to function properly.</small>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="analytics" {% if cookie_preferences.analytics == 'true' %}checked{% endif %}>
+                            Analytics Cookies
+                        </label>
+                        <small class="form-text">Help us improve our website by collecting anonymous usage data.</small>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="functional" {% if cookie_preferences.functional == 'true' %}checked{% endif %}>
+                            Functional Cookies
+                        </label>
+                        <small class="form-text">Enable enhanced functionality and personalization.</small>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="marketing" {% if cookie_preferences.marketing == 'true' %}checked{% endif %}>
+                            Marketing Cookies
+                        </label>
+                        <small class="form-text">Help deliver more relevant advertising content.</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeCookieSettings()">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveCookiePreferences()">Save Preferences</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update the JavaScript -->
+<script>
+    function openCookieSettings() {
+        document.getElementById('cookieSettingsModal').style.display = 'block';
+    }
+
+    function closeCookieSettings() {
+        document.getElementById('cookieSettingsModal').style.display = 'none';
+    }
+
+    async function saveCookiePreferences() {
+        const form = document.getElementById('cookiePreferencesForm');
+        const preferences = {
+            essential: true, // Always true
+            analytics: form.elements['analytics'].checked,
+            functional: form.elements['functional'].checked,
+            marketing: form.elements['marketing'].checked
+        };
+
+        try {
+            const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+            const response = await fetch('/save-cookie-preferences', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(preferences),
+                credentials: 'same-origin'
+            });
+
+            if (response.ok) {
+                closeCookieSettings();
+                window.location.href = window.location.pathname + '?message=preferences_saved';
+            } else {
+                throw new Error('Failed to save preferences');
+            }
+        } catch (error) {
+            console.error('Error saving preferences:', error);
+            window.location.href = window.location.pathname + '?message=preferences_error';
+        }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('cookieSettingsModal');
+        if (event.target == modal) {
+            closeCookieSettings();
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,282 @@
+{% extends 'common/base.html' %}
+
+{% block title %}About Us - World Hotels{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                    url("{{ url_for('static', filename='images/destination-hero.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        color: white;
+        text-align: center;
+    }
+
+    .hero-content {
+        width: 100%;
+    }
+
+    .hero-content h1 {
+        font-size: 3.5rem;
+        font-weight: 300;
+        margin-bottom: 1rem;
+        font-family: var(--font-display);
+    }
+
+    .hero-content p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+
+    .story-section {
+        padding: 6rem 0;
+        background-color: #fff;
+    }
+
+    .story-content {
+        padding-right: 3rem;
+    }
+
+    .subtitle {
+        color: var(--accent-color);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .story-content h2 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin-bottom: 2rem;
+        font-family: var(--font-display);
+    }
+
+    .story-content p {
+        color: #666;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+    }
+
+    .story-image img {
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .values-section {
+        padding: 6rem 0;
+        background-color: #f8f9fa;
+    }
+
+    .values-section h2 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin-bottom: 4rem;
+        font-family: var(--font-display);
+    }
+
+    .value-card {
+        text-align: center;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .value-card i {
+        font-size: 2.5rem;
+        color: var(--accent-color);
+        margin-bottom: 1.5rem;
+    }
+
+    .value-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        font-family: var(--font-display);
+    }
+
+    .value-card p {
+        color: #666;
+        line-height: 1.6;
+    }
+
+    .team-section {
+        padding: 6rem 0;
+        background-color: #fff;
+    }
+
+    .team-section h2 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin-bottom: 4rem;
+        font-family: var(--font-display);
+    }
+
+    .team-member {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .team-member img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin-bottom: 1.5rem;
+        object-fit: cover;
+    }
+
+    .team-member h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        font-family: var(--font-display);
+    }
+
+    .team-member .position {
+        color: var(--accent-color);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    @media (max-width: 991px) {
+        .story-content {
+            padding-right: 0;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .story-content h2 {
+            font-size: 2rem;
+        }
+
+        .values-section h2,
+        .team-section h2 {
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            height: 300px;
+        }
+
+        .hero-content h1 {
+            font-size: 2.5rem;
+        }
+
+        .hero-content p {
+            font-size: 1rem;
+        }
+
+        .story-section,
+        .values-section,
+        .team-section {
+            padding: 4rem 0;
+        }
+
+        .value-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="about-page">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <h1>About World Hotels</h1>
+                <p>A Legacy of Luxury Since 1988</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Story Section -->
+    <section class="story-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="story-content">
+                        <span class="subtitle">Our Story</span>
+                        <h2>A Journey of Excellence</h2>
+                        <p>World Hotels began in 1988 with a single boutique hotel in London and has grown into a global collection of luxury properties. We are dedicated to providing excellent service, paying attention to every detail, and creating memorable experiences for our guests.
+                        <p>Today, we continue to lead in luxury hospitality, offering a blend of timeless elegance and modern innovation in our carefully selected hotels and resorts around the world.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="story-image">
+                        <img src="{{ url_for('static', filename='images/about/story.jpg') }}" alt="World Hotels Story">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="values-section">
+        <div class="container">
+            <h2 class="text-center">Our Core Values</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="value-card">
+                        <i class="fas fa-star"></i>
+                        <h3>Excellence</h3>
+                        <p>We strive for excellence in every detail, ensuring each guest experiences the highest standards of luxury and comfort.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="value-card">
+                        <i class="fas fa-heart"></i>
+                        <h3>Passion</h3>
+                        <p>Our passion for hospitality drives us to create memorable experiences that exceed expectations.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="value-card">
+                        <i class="fas fa-handshake"></i>
+                        <h3>Integrity</h3>
+                        <p>We conduct our business with the highest level of integrity, building trust with our guests and partners.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section">
+        <div class="container">
+            <h2 class="text-center">Leadership Team</h2>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="team-member">
+                        <img src="{{ url_for('static', filename='images/about/ceo.jpeg') }}" alt="CEO">
+                        <h3>Small Girl</h3>
+                        <p class="position">Chief Executive Officer</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="team-member">
+                        <img src="{{ url_for('static', filename='images/about/coo.jpeg') }}" alt="COO">
+                        <h3>Himal Acharya</h3>
+                        <p class="position">Chief Operations Officer</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="team-member">
+                        <img src="{{ url_for('static', filename='images/about/cfo.jpeg') }}" alt="CFO">
+                        <h3>Ridesh Khadka</h3>
+                        <p class="position">Chief Financial Officer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
