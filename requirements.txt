@@ -1,0 +1,16 @@
+Flask
+flask_mysqldb
+Werkzeug
+mysqlclient
+qrcode
+Pillow
+python-dotenv
+cryptography
+flask_limiter
+flask_wtf
+pdfkit
+flask_mail
+flask_login
+email_validator
+itsdangerous
+openpyxl
